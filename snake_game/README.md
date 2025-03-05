@@ -62,7 +62,6 @@ Diferentes modelos de lenguaje pueden responder de manera variable a un mismo `p
 | Phi 4       | ⭐⭐⭐               | ✅           | ❌                | ⭐⭐⭐ | 
 | Qwen 2.5    | ⭐                | ❌         | YES                | ⭐ | 
 
-
 ---
 
 ## 📸 Screenshots
@@ -88,7 +87,14 @@ Por otro lado, modelos que han sido entrenados con datos de código pueden gener
 Un prompt más elaborado y desde luego varias interacciones con estos modelos, hubieran dado un resultado más elaborado. En cualquier caso, el uso de estos modelos pueden servir como punto base para desarrollos más complejos pero sin olvidar de la importancia de la interpretabilidad del código.
 
 ---
+## 💻 Archivos HTML
 
+A continuación, encontrarás los enlaces a los archivos HTML generados para cada implementación del juego SNAKE. Haz clic en cada enlace para abrir los archivos en una nueva pestaña del navegador:
+
+- <a href="snake_game_by_GPT-4o.html" target="_blank">Juego SNAKE - Implementación GPT-4o</a>
+
+
+---
 ## 🔗 Referencias
 
 - [Historia del juego Snake - Wikipedia](https://es.wikipedia.org/wiki/Snake_(videojuego))
