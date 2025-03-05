@@ -1,0 +1,16 @@
+Genera un juego Snake utilizando HTML, CSS y JavaScript.
+(1) La interfaz debe incluir un área de juego dentro de un recuadro donde se moverá la serpiente y, debajo, un botón "PLAY" para iniciar el juego.
+Incluye un título multicolor tipo arcade pixelado y encima del recuadro que indique SNAKE GAME, cada letra será de un color.
+(2) La serpiente iniciará con un solo segmento y se moverá en respuesta a las flechas del teclado.
+(3) A medida que consuma premios generados aleatoriamente en la pantalla, crecerá en longitud.
+(4) Condiciones de finalización:
+--- La serpiente alcanza una longitud de 20.
+--- Choca con las paredes del área de juego.
+--- Choca consigo misma.
+(5) Cuando la serpiente colisione, cambiará de color verde a rojo, aparecerá un mensaje "GAME OVER", y el usuario podrá elegir entre reiniciar el juego o salir.
+(6) Extras a considerar para mejorar la experiencia:
+--- Velocidad progresiva: Opción para aumentar ligeramente la velocidad conforme la serpiente crece.
+--- Estética: Se recomienda un diseño moderno con CSS para mejorar la experiencia visual.
+--- Estructura del código: Utilizar una clase en JavaScript para manejar la lógica del juego de forma organizada.
+--- Efectos y animaciones: Agregar una animación de movimiento fluido para mejorar la experiencia.
+(7) Genera todo el código dentro del html
