@@ -92,6 +92,12 @@ Un prompt más elaborado y desde luego varias interacciones con estos modelos, h
 A continuación, encontrarás los enlaces a los archivos HTML generados para cada implementación del juego SNAKE. Haz clic en cada enlace para abrir los archivos en una nueva pestaña del navegador:
 
 - <a href="snake_game_by_GPT-4o.html" target="_blank">Juego SNAKE - Implementación GPT-4o</a>
+- <a href="snake_game_by_Claude_3.5_Sonnet .html" target="_blank">Juego SNAKE - Implementación Claude 3.5 Sonnet</a>
+- <a href="snake_game_by_DeepSeek_R1.html" target="_blank">Juego SNAKE - Implementación DeepSeek R1</a>
+- <a href="snake_game_by_Gemini_2.0_Flash.html" target="_blank">Juego SNAKE - Implementación Gemini 2.0 Flash</a>
+- <a href="snake_game_by_Llama3.3-70b.html" target="_blank">Juego SNAKE - Implementación Llama 3.3 70b</a>
+- <a href="snake_game_by_Phi4.html" target="_blank">Juego SNAKE - Implementación Phi 4</a>
+- <a href="snake_game_by_Qwen2.5-Coder-32b.html" target="_blank">Juego SNAKE - Implementación Qwen 2.5 Coder 32b</a>
 
 
 ---
