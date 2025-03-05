@@ -1,0 +1,290 @@
+<!--Cuando alcanza la longitud 20 finaliza el juego como GAME OVER-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game by Gemini 2.0 Flash</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .title {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .title span {
+            display: inline-block;
+            animation: rainbow 3s linear infinite;
+        }
+
+        @keyframes rainbow {
+            0% { color: red; }
+            14% { color: orange; }
+            28% { color: yellow; }
+            42% { color: green; }
+            57% { color: blue; }
+            71% { color: indigo; }
+            85% { color: violet; }
+            100% { color: red; }
+        }
+
+        #game-container {
+            border: 2px solid #333;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #fff;
+        }
+
+        #game-board {
+            background-color: #eee;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #3e8e41;
+        }
+
+        #game-over-message {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            font-size: 2em;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        #game-over-message button {
+            margin: 10px;
+        }
+
+        .pixelated {
+            image-rendering: pixelated; /* Modern browsers */
+            image-rendering: -moz-crisp-edges; /* Firefox */
+            image-rendering: -webkit-optimize-contrast; /* Webkit (Safari, Chrome) */
+            -ms-interpolation-mode: nearest-neighbor;  /* IE */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="title">
+        <span style="animation-delay: 0s;">S</span>
+        <span style="animation-delay: 0.3s;">N</span>
+        <span style="animation-delay: 0.6s;">A</span>
+        <span style="animation-delay: 0.9s;">K</span>
+        <span style="animation-delay: 1.2s;">E</span>
+        <span> </span>
+        <span style="animation-delay: 1.5s;">G</span>
+        <span style="animation-delay: 1.8s;">A</span>
+        <span style="animation-delay: 2.1s;">M</span>
+        <span style="animation-delay: 2.4s;">E</span>
+    </div>
+
+    <div id="game-container">
+        <canvas id="game-board" width="400" height="400"></canvas>
+    </div>
+
+    <button id="start-button">PLAY</button>
+
+    <div id="game-over-message">
+        GAME OVER
+        <button id="restart-button">Restart</button>
+        <button id="quit-button">Quit</button>
+    </div>
+
+    <script>
+        class SnakeGame {
+            constructor(canvasId, startButtonId, gameOverMessageId, restartButtonId, quitButtonId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.startButton = document.getElementById(startButtonId);
+                this.gameOverMessage = document.getElementById(gameOverMessageId);
+                this.restartButton = document.getElementById(restartButtonId);
+                this.quitButton = document.getElementById(quitButtonId);
+
+                this.gridSize = 20;
+                this.tileCountX = this.canvas.width / this.gridSize;
+                this.tileCountY = this.canvas.height / this.gridSize;
+
+                this.snake = [{x: 10, y: 10}];
+                this.food = this.generateFood();
+                this.direction = {x: 1, y: 0};
+                this.speed = 150; // milliseconds between frames
+                this.gameInterval = null;
+                this.isGameOver = false;
+                this.snakeColor = 'green';
+                this.score = 0;
+
+                this.startButton.addEventListener('click', () => this.startGame());
+                this.restartButton.addEventListener('click', () => this.restartGame());
+                this.quitButton.addEventListener('click', () => this.quitGame());
+                document.addEventListener('keydown', (event) => this.handleKeyPress(event));
+            }
+
+            startGame() {
+                this.resetGame(); // Reset game state before starting a new game.
+                this.gameInterval = setInterval(() => this.gameLoop(), this.speed);
+                this.startButton.disabled = true;
+            }
+
+            resetGame() {
+                this.snake = [{x: 10, y: 10}];
+                this.food = this.generateFood();
+                this.direction = {x: 1, y: 0};
+                this.speed = 150;
+                this.isGameOver = false;
+                this.snakeColor = 'green';
+                this.score = 0; // Reset the score
+                this.gameOverMessage.style.display = 'none';
+                clearInterval(this.gameInterval);
+            }
+
+
+            restartGame() {
+                this.startGame();
+            }
+
+            quitGame() {
+                // For now, just resets the game state.  In a more complex app, you might
+                // navigate to a different page or perform other cleanup.
+                this.resetGame();
+                this.startButton.disabled = false;
+            }
+
+            handleKeyPress(event) {
+                switch (event.key) {
+                    case 'ArrowUp':
+                        if (this.direction.y === 0) this.direction = {x: 0, y: -1};
+                        break;
+                    case 'ArrowDown':
+                        if (this.direction.y === 0) this.direction = {x: 0, y: 1};
+                        break;
+                    case 'ArrowLeft':
+                        if (this.direction.x === 0) this.direction = {x: -1, y: 0};
+                        break;
+                    case 'ArrowRight':
+                        if (this.direction.x === 0) this.direction = {x: 1, y: 0};
+                        break;
+                }
+            }
+
+            gameLoop() {
+                this.update();
+                this.draw();
+            }
+
+            update() {
+                if (this.isGameOver) return;
+
+                const head = {x: this.snake[0].x + this.direction.x, y: this.snake[0].y + this.direction.y};
+
+                // Check for collision with walls
+                if (head.x < 0 || head.x >= this.tileCountX || head.y < 0 || head.y >= this.tileCountY) {
+                    this.gameOver();
+                    return;
+                }
+
+                // Check for collision with itself
+                for (let i = 1; i < this.snake.length; i++) {
+                    if (head.x === this.snake[i].x && head.y === this.snake[i].y) {
+                        this.gameOver();
+                        return;
+                    }
+                }
+
+
+                this.snake.unshift(head);
+
+                if (head.x === this.food.x && head.y === this.food.y) {
+                    this.food = this.generateFood();
+                    this.score++;
+
+                    // Progressive speed increase
+                    if (this.snake.length % 5 === 0 && this.speed > 50) { //Adjust the speed
+                        clearInterval(this.gameInterval);
+                        this.speed -= 10;
+                        this.gameInterval = setInterval(() => this.gameLoop(), this.speed);
+                    }
+
+                     // Check if snake reached max length
+                    if(this.snake.length >= 20){
+                         this.gameOver();
+                         return;
+                    }
+
+                } else {
+                    this.snake.pop();
+                }
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Draw Snake
+                this.ctx.fillStyle = this.snakeColor;
+                this.snake.forEach(segment => {
+                    this.ctx.fillRect(segment.x * this.gridSize, segment.y * this.gridSize, this.gridSize - 2, this.gridSize - 2);
+                });
+
+                // Draw Food
+                this.ctx.fillStyle = 'red';
+                this.ctx.fillRect(this.food.x * this.gridSize, this.food.y * this.gridSize, this.gridSize - 2, this.gridSize - 2);
+            }
+
+            generateFood() {
+                let food = {
+                    x: Math.floor(Math.random() * this.tileCountX),
+                    y: Math.floor(Math.random() * this.tileCountY)
+                };
+
+                // Make sure food doesn't spawn on the snake
+                for (let i = 0; i < this.snake.length; i++) {
+                    if (food.x === this.snake[i].x && food.y === this.snake[i].y) {
+                        return this.generateFood(); // Recursively generate new food
+                    }
+                }
+
+                return food;
+            }
+
+            gameOver() {
+                this.isGameOver = true;
+                this.snakeColor = 'red';
+                clearInterval(this.gameInterval);
+                this.gameOverMessage.style.display = 'block';
+                this.startButton.disabled = false;
+            }
+        }
+
+        const game = new SnakeGame('game-board', 'start-button', 'game-over-message', 'restart-button', 'quit-button');
+    </script>
+</body>
+</html>

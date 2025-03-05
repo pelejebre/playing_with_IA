@@ -1,0 +1,272 @@
+<!--No funciona-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Snake Game by DeepSeek R1</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1a1a1a;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #title {
+            background-image: linear-gradient(45deg, #FF0000, #00FF00, #0000FF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 3em;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            background-color: #2a2a2a;
+            border: 3px solid #4a4a4a;
+            margin: 20px;
+        }
+
+        #snake {
+            position: absolute;
+            background-color: #4CAF50;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        #prize {
+            position: absolute;
+            background-color: #ff4444;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        #gameOver {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #controls {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="title">SNAKE GAME</h1>
+    <div id="gameContainer">
+        <div id="gameOver">
+            <h2 id="gameOverText">GAME OVER</h2>
+            <button onclick="restartGame()">Reintentar</button>
+            <button onclick="exitGame()">Salir</button>
+        </div>
+    </div>
+    <div id="controls">
+        <button onclick="startGame()">PLAY</button>
+    </div>
+
+    <script>
+        class SnakeGame {
+            constructor() {
+                this.snake = [];
+                this.prisons = [];
+                this.direction = 'right';
+                this.gameOver = false;
+                this.gameContainer = document.getElementById('gameContainer');
+                this.snakeLength = 1;
+                this.speed = 150;
+                this.initialPosition = { x: 200, y: 200 };
+                this.createSnake();
+                this.createPrize();
+            }
+
+            createSnake() {
+                this.snake = [];
+                const segment = document.createElement('div');
+                segment.className = 'snake';
+                segment.id = 'snake';
+                segment.style.left = `${this.initialPosition.x}px`;
+                segment.style.top = `${this.initialPosition.y}px`;
+                this.gameContainer.appendChild(segment);
+                this.snake.push(segment);
+            }
+
+            createPrize() {
+                if (this.snake.some(segment => this.checkCollision(segment, this.snake[0]))) {
+                    this.createPrize();
+                    return;
+                }
+                const prize = document.createElement('div');
+                prize.className = 'prize';
+                prize.id = 'prize';
+                prize.style.left = `${Math.floor(Math.random() * (400/20)) * 20}px`;
+                prize.style.top = `${Math.floor(Math.random() * (400/20)) * 20}px`;
+                this.gameContainer.appendChild(prize);
+                this.prisons.push(prize);
+            }
+
+            checkCollision(element1, element2) {
+                const rect1 = element1.getBoundingClientRect();
+                const rect2 = element2.getBoundingClientRect();
+                return !(rect1.right < rect2.left || 
+                        rect1.left > rect2.right || 
+                        rect1.bottom < rect2.top || 
+                        rect1.top > rect2.bottom);
+            }
+
+            move() {
+                if (this.gameOver) return;
+
+                const head = this.snake[0];
+                const newX = parseInt(head.style.left);
+                const newY = parseInt(head.style.top);
+
+                if (this.direction === 'right') newX += 20;
+                if (this.direction === 'left') newX -= 20;
+                if (this.direction === 'up') newY -= 20;
+                if (this.direction === 'down') newY += 20;
+
+                // Check wall collision
+                if (newX < 0 || newX >= 400 || newY < 0 || newY >= 400) {
+                    this.endGame();
+                    return;
+                }
+
+                // Check self collision
+                for (let i = 1; i < this.snake.length; i++) {
+                    if (this.checkCollision(head, this.snake[i])) {
+                        this.endGame();
+                        return;
+                    }
+                }
+
+                head.style.left = `${newX}px`;
+                head.style.top = `${newY}px`;
+
+                // Check prize collision
+                this.prisons.forEach(prize => {
+                    if (this.checkCollision(head, prize)) {
+                        this.snakeLength++;
+                        if (this.snakeLength >= 20) this.endGame();
+                        this.createPrize();
+                        prize.remove();
+                        this.createSnakeSegment();
+                        if (this.speed > 50) this.speed -= 2;
+                    }
+                });
+
+                setTimeout(() => this.move(), this.speed);
+            }
+
+            createSnakeSegment() {
+                const last = this.snake[this.snake.length - 1];
+                const newSegment = document.createElement('div');
+                newSegment.className = 'snake';
+                newSegment.style.left = last.style.left;
+                newSegment.style.top = last.style.top;
+                this.gameContainer.appendChild(newSegment);
+                this.snake.push(newSegment);
+            }
+
+            endGame() {
+                this.gameOver = true;
+                const gameOverDiv = document.getElementById('gameOver');
+                const head = this.snake[0];
+                head.style.backgroundColor = '#ff4444';
+                gameOverDiv.style.display = 'block';
+                gameOverDiv.style.top = `${parseInt(head.style.top) + 10}px`;
+                gameOverDiv.style.left = `${parseInt(head.style.left) + 10}px`;
+            }
+
+            reset() {
+                this.snake.forEach(segment => segment.remove());
+                this.prisons.forEach(prize => prize.remove());
+                this.snake = [];
+                this.prisons = [];
+                this.createSnake();
+                this.createPrize();
+                this.direction = 'right';
+                this.gameOver = false;
+                this.snakeLength = 1;
+                this.speed = 150;
+                document.getElementById('gameOver').style.display = 'none';
+            }
+        }
+
+        let game;
+
+        function startGame() {
+            if (!game) {
+                game = new SnakeGame();
+            }
+            document.addEventListener('keydown', handleKeyPress);
+            game.move();
+        }
+
+        function restartGame() {
+            if (game) {
+                game.reset();
+                startGame();
+            }
+        }
+
+        function exitGame() {
+            window.close();
+            // window.location.href = '/';
+        }
+
+        function handleKeyPress(event) {
+            if (!game || game.gameOver) return;
+
+            switch (event.key) {
+                case 'ArrowUp':
+                    if (game.direction !== 'down') game.direction = 'up';
+                    break;
+                case 'ArrowDown':
+                    if (game.direction !== 'up') game.direction = 'down';
+                    break;
+                case 'ArrowLeft':
+                    if (game.direction !== 'right') game.direction = 'left';
+                    break;
+                case 'ArrowRight':
+                    if (game.direction !== 'left') game.direction = 'right';
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

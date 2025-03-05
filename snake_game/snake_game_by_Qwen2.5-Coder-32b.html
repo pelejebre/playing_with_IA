@@ -1,0 +1,210 @@
+<!--NO FUNCIONA-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game by Qwen 2.5 Coder 32b</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        h1 {
+            margin: 0;
+            font-size: 4rem;
+            text-align: center;
+        }
+        h1 span {
+            animation: color-change 2s infinite alternate;
+        }
+        @keyframes color-change {
+            0% { color: #ff0000; }
+            33% { color: #00ff00; }
+            66% { color: #0000ff; }
+            100% { color: #ffff00; }
+        }
+        #game-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border: 2px solid #fff;
+            background-color: #111;
+        }
+        .snake, .food {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #00ff00;
+        }
+        .food {
+            background-color: #ff0000;
+        }
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff0000;
+            font-size: 2rem;
+            display: none;
+        }
+        #controls {
+            margin-top: 20px;
+        }
+        button {
+            background-color: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>
+        <span>S</span><span>N</span><span>A</span><span>K</span><span>E</span>
+        <span>&nbsp;</span>
+        <span>G</span><span>A</span><span>M</span><span>E</span>
+    </h1>
+    <div id="game-container">
+        <div id="game-over">GAME OVER</div>
+    </div>
+    <div id="controls">
+        <button id="play-btn">PLAY</button>
+    </div>
+
+    <script>
+        class SnakeGame {
+            constructor() {
+                this.canvas = document.getElementById('game-container');
+                this.ctx = this.canvas.getContext('2d');
+                this.snake = [{ x: 200, y: 200 }];
+                this.direction = { x: 0, y: 0 };
+                this.food = { x: 0, y: 0 };
+                this.score = 0;
+                this.speed = 100;
+                this.gameOver = false;
+                this.playButton = document.getElementById('play-btn');
+                this.playButton.addEventListener('click', this.startGame.bind(this));
+            }
+
+            startGame() {
+                this.snake = [{ x: 200, y: 200 }];
+                this.direction = { x: 0, y: 0 };
+                this.score = 0;
+                this.speed = 100;
+                this.gameOver = false;
+                document.getElementById('game-over').style.display = 'none';
+                this.canvas.style.borderColor = '#fff';
+                this.placeFood();
+                this.update();
+            }
+
+            update() {
+                if (this.gameOver) return;
+
+                setTimeout(() => {
+                    this.clearCanvas();
+                    this.moveSnake();
+                    this.checkCollision();
+                    this.drawSnake();
+                    this.drawFood();
+                    this.update();
+                }, this.speed);
+            }
+
+            clearCanvas() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            moveSnake() {
+                const head = { x: this.snake[0].x + this.direction.x, y: this.snake[0].y + this.direction.y };
+                this.snake.unshift(head);
+
+                if (head.x === this.food.x && head.y === this.food.y) {
+                    this.score++;
+                    this.speed = Math.max(50, this.speed - 5);
+                    this.placeFood();
+                } else {
+                    this.snake.pop();
+                }
+            }
+
+            checkCollision() {
+                const head = this.snake[0];
+
+                if (head.x < 0 || head.x >= this.canvas.width || head.y < 0 || head.y >= this.canvas.height) {
+                    this.endGame();
+                    return;
+                }
+
+                for (let i = 1; i < this.snake.length; i++) {
+                    if (head.x === this.snake[i].x && head.y === this.snake[i].y) {
+                        this.endGame();
+                        return;
+                    }
+                }
+
+                if (this.snake.length >= 20) {
+                    this.endGame();
+                    return;
+                }
+            }
+
+            endGame() {
+                this.gameOver = true;
+                this.canvas.style.borderColor = '#ff0000';
+                document.getElementById('game-over').style.display = 'block';
+            }
+
+            drawSnake() {
+                this.snake.forEach((segment, index) => {
+                    this.ctx.fillStyle = index === 0 ? '#00ff00' : '#0f0';
+                    this.ctx.fillRect(segment.x, segment.y, 20, 20);
+                });
+            }
+
+            drawFood() {
+                this.ctx.fillStyle = '#ff0000';
+                this.ctx.fillRect(this.food.x, this.food.y, 20, 20);
+            }
+
+            placeFood() {
+                this.food.x = Math.floor(Math.random() * 20) * 20;
+                this.food.y = Math.floor(Math.random() * 20) * 20;
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowUp':
+                    if (game.direction.y === 0) game.direction = { x: 0, y: -20 };
+                    break;
+                case 'ArrowDown':
+                    if (game.direction.y === 0) game.direction = { x: 0, y: 20 };
+                    break;
+                case 'ArrowLeft':
+                    if (game.direction.x === 0) game.direction = { x: -20, y: 0 };
+                    break;
+                case 'ArrowRight':
+                    if (game.direction.x === 0) game.direction = { x: 20, y: 0 };
+                    break;
+            }
+        });
+
+        const game = new SnakeGame();
+    </script>
+</body>
+</html>

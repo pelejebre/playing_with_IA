@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game by GPT-4o</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #222;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .game-title {
+            margin-bottom: 20px;
+        }
+
+        .game-title span {
+            font-size: 48px;
+            font-weight: bold;
+            display: inline-block;
+            animation: pulse 1s infinite alternate;
+            text-shadow: 2px 2px 2px rgba(0,0,0,0.5);
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .game-container {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        canvas {
+            background-color: #000;
+            border: 2px solid #444;
+        }
+
+        #playButton {
+            margin-top: 20px;
+            padding: 10px 30px;
+            font-size: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #playButton:hover {
+            background-color: #45a049;
+        }
+
+        #gameOver {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        #gameOver button {
+            margin: 10px;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-title">
+        <span style="color: #ff0000">S</span>
+        <span style="color: #ff7f00">N</span>
+        <span style="color: #ffff00">A</span>
+        <span style="color: #00ff00">K</span>
+        <span style="color: #0000ff">E</span>
+        <span style="color: #4b0082"> </span>
+        <span style="color: #9400d3">G</span>
+        <span style="color: #ff1493">A</span>
+        <span style="color: #00ffff">M</span>
+        <span style="color: #ff69b4">E</span>
+    </div>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+    </div>
+    <button id="playButton">PLAY</button>
+    <div id="gameOver">
+        <h2>GAME OVER</h2>
+        <button onclick="game.restart()">Restart</button>
+        <button onclick="game.quit()">Quit</button>
+    </div>
+
+    <script>
+        class SnakeGame {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.gridSize = 20;
+                this.snake = [{x: 10, y: 10}];
+                this.direction = {x: 1, y: 0};
+                this.food = this.getRandomPosition();
+                this.gameLoop = null;
+                this.speed = 150;
+                this.gameOver = false;
+
+                document.getElementById('playButton').addEventListener('click', () => this.start());
+                document.addEventListener('keydown', (e) => this.handleInput(e));
+            }
+
+            getRandomPosition() {
+                return {
+                    x: Math.floor(Math.random() * (this.canvas.width / this.gridSize)),
+                    y: Math.floor(Math.random() * (this.canvas.height / this.gridSize))
+                };
+            }
+
+            handleInput(event) {
+                switch(event.key) {
+                    case 'ArrowUp':
+                        if (this.direction.y !== 1) this.direction = {x: 0, y: -1};
+                        break;
+                    case 'ArrowDown':
+                        if (this.direction.y !== -1) this.direction = {x: 0, y: 1};
+                        break;
+                    case 'ArrowLeft':
+                        if (this.direction.x !== 1) this.direction = {x: -1, y: 0};
+                        break;
+                    case 'ArrowRight':
+                        if (this.direction.x !== -1) this.direction = {x: 1, y: 0};
+                        break;
+                }
+            }
+
+            update() {
+                const head = {
+                    x: this.snake[0].x + this.direction.x,
+                    y: this.snake[0].y + this.direction.y
+                };
+
+                // Verificar colisiones
+                if (head.x < 0 || head.x >= this.canvas.width / this.gridSize ||
+                    head.y < 0 || head.y >= this.canvas.height / this.gridSize ||
+                    this.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                    this.end();
+                    return;
+                }
+
+                this.snake.unshift(head);
+
+                // Verificar si come la comida
+                if (head.x === this.food.x && head.y === this.food.y) {
+                    if (this.snake.length >= 20) {
+                        this.win();
+                        return;
+                    }
+                    this.food = this.getRandomPosition();
+                    this.speed *= 0.95; // Aumentar velocidad
+                    clearInterval(this.gameLoop);
+                    this.gameLoop = setInterval(() => this.update(), this.speed);
+                } else {
+                    this.snake.pop();
+                }
+
+                this.draw();
+            }
+
+            draw() {
+                this.ctx.fillStyle = 'black';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Dibujar serpiente
+                this.ctx.fillStyle = this.gameOver ? 'red' : 'green';
+                this.snake.forEach(segment => {
+                    this.ctx.fillRect(
+                        segment.x * this.gridSize,
+                        segment.y * this.gridSize,
+                        this.gridSize - 1,
+                        this.gridSize - 1
+                    );
+                });
+
+                // Dibujar comida
+                this.ctx.fillStyle = 'red';
+                this.ctx.fillRect(
+                    this.food.x * this.gridSize,
+                    this.food.y * this.gridSize,
+                    this.gridSize - 1,
+                    this.gridSize - 1
+                );
+            }
+
+            start() {
+                this.snake = [{x: 10, y: 10}];
+                this.direction = {x: 1, y: 0};
+                this.food = this.getRandomPosition();
+                this.speed = 150;
+                this.gameOver = false;
+                document.getElementById('gameOver').style.display = 'none';
+                if (this.gameLoop) clearInterval(this.gameLoop);
+                this.gameLoop = setInterval(() => this.update(), this.speed);
+            }
+
+            end() {
+                this.gameOver = true;
+                clearInterval(this.gameLoop);
+                this.draw();
+                document.getElementById('gameOver').style.display = 'block';
+            }
+
+            win() {
+                this.gameOver = true;
+                clearInterval(this.gameLoop);
+                alert('¡Felicidades! Has ganado el juego.');
+                document.getElementById('gameOver').style.display = 'block';
+            }
+
+            restart() {
+                this.start();
+            }
+
+            quit() {
+                this.gameOver = true;
+                clearInterval(this.gameLoop);
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                document.getElementById('gameOver').style.display = 'none';
+            }
+        }
+
+        const game = new SnakeGame();
+    </script>
+</body>
+</html>

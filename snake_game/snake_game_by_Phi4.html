@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game by Phi4</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #333;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        .game-container {
+            text-align: center;
+        }
+        h1 {
+            color: #00FF00; /* Verde */
+            font-size: 2em;
+            letter-spacing: 5px;
+        }
+        h1 span {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .game-box {
+            width: 400px;
+            height: 400px;
+            border: 2px solid #FFF;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .snake-segment {
+            width: 20px;
+            height: 20px;
+            background-color: #00FF00; /* Verde */
+            position: absolute;
+        }
+        .food {
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            position: absolute;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        #game-over-message {
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>
+            <span style="color:#FF0000;">S</span><span style="color:#00FFFF;">N</span><span style="color:#FFA500;">A</span><span style="color:#008080;">K</span><span style="color:#800080;">E</span> 
+            <span style="color:#FFD700;">G</span><span style="color:#8B4513;">A</span><span style="color:#DC143C;">M</span><span style="color:#2F4F4F;">E</span>
+        </h1>
+        <div class="game-box" id="gameBox"></div>
+        <button onclick="startGame()">PLAY</button>
+        <p id="game-over-message">GAME OVER! Click PLAY to restart.</p>
+    </div>
+
+    <script>
+        const gameBox = document.getElementById('gameBox');
+        const gameOverMessage = document.getElementById('game-over-message');
+
+        class SnakeGame {
+            constructor() {
+                this.snake = [{ x: 200, y: 200 }];
+                this.food = null;
+                this.direction = 'RIGHT';
+                this.gameOver = false;
+                this.speed = 100;
+                this.intervalId = null;
+
+                document.addEventListener('keydown', (e) => this.changeDirection(e));
+            }
+
+            start() {
+                if (this.intervalId !== null) return;
+                this.generateFood();
+                this.intervalId = setInterval(() => this.move(), this.speed);
+            }
+
+            changeDirection(event) {
+                const keyMap = {
+                    ArrowUp: 'UP',
+                    ArrowDown: 'DOWN',
+                    ArrowLeft: 'LEFT',
+                    ArrowRight: 'RIGHT'
+                };
+                const newDirection = keyMap[event.key];
+                if (newDirection && !this.isOppositeDirection(newDirection)) {
+                    this.direction = newDirection;
+                }
+            }
+
+            isOppositeDirection(newDirection) {
+                const head = this.snake[0];
+                return (
+                    (this.direction === 'UP' && newDirection === 'DOWN') ||
+                    (this.direction === 'DOWN' && newDirection === 'UP') ||
+                    (this.direction === 'LEFT' && newDirection === 'RIGHT') ||
+                    (this.direction === 'RIGHT' && newDirection === 'LEFT')
+                );
+            }
+
+            move() {
+                if (this.gameOver) return;
+
+                const head = { ...this.snake[0] };
+                switch (this.direction) {
+                    case 'UP': head.y -= 20; break;
+                    case 'DOWN': head.y += 20; break;
+                    case 'LEFT': head.x -= 20; break;
+                    case 'RIGHT': head.x += 20; break;
+                }
+
+                if (
+                    head.x < 0 || head.x >= gameBox.clientWidth ||
+                    head.y < 0 || head.y >= gameBox.clientHeight ||
+                    this.snake.some(segment => segment.x === head.x && segment.y === head.y)
+                ) {
+                    this.gameOver = true;
+                    clearInterval(this.intervalId);
+                    gameOverMessage.style.display = 'block';
+                    document.querySelectorAll('.snake-segment').forEach(el => el.style.backgroundColor = '#FF0000');
+                    return;
+                }
+
+                if (head.x === this.food.x && head.y === this.food.y) {
+                    this.snake.unshift(head);
+                    this.generateFood();
+                    if (this.snake.length >= 20) {
+                        this.gameOver = true;
+                        clearInterval(this.intervalId);
+                        gameOverMessage.style.display = 'block';
+                        document.querySelectorAll('.snake-segment').forEach(el => el.style.backgroundColor = '#FF0000');
+                    }
+                } else {
+                    this.snake.pop();
+                    this.snake.unshift(head);
+                }
+
+                this.render();
+            }
+
+            generateFood() {
+                let food;
+                do {
+                    food = {
+                        x: Math.floor(Math.random() * (gameBox.clientWidth / 20)) * 20,
+                        y: Math.floor(Math.random() * (gameBox.clientHeight / 20)) * 20
+                    };
+                } while (
+                    this.snake.some(segment => segment.x === food.x && segment.y === food.y)
+                );
+                this.food = food;
+            }
+
+            render() {
+                gameBox.innerHTML = '';
+                this.snake.forEach((segment, index) => {
+                    const snakeSegment = document.createElement('div');
+                    snakeSegment.classList.add('snake-segment');
+                    snakeSegment.style.left = `${segment.x}px`;
+                    snakeSegment.style.top = `${segment.y}px`;
+                    gameBox.appendChild(snakeSegment);
+                });
+
+                if (this.food) {
+                    const foodElement = document.createElement('div');
+                    foodElement.classList.add('food');
+                    foodElement.style.left = `${this.food.x}px`;
+                    foodElement.style.top = `${this.food.y}px`;
+                    gameBox.appendChild(foodElement);
+                }
+            }
+
+            reset() {
+                this.snake = [{ x: 200, y: 200 }];
+                this.direction = 'RIGHT';
+                this.gameOver = false;
+                document.querySelectorAll('.snake-segment').forEach(el => el.remove());
+                if (this.intervalId) clearInterval(this.intervalId);
+                gameOverMessage.style.display = 'none';
+            }
+        }
+
+        const snakeGame = new SnakeGame();
+
+        function startGame() {
+            snakeGame.reset();
+            snakeGame.start();
+        }
+    </script>
+</body>
+</html>
