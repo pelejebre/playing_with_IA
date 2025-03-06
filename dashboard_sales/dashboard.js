@@ -21,7 +21,11 @@ const config = {
         currency: 'EUR',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
-    })
+    }),
+    months: [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ]
 };
 
 // Funciones de utilidad
@@ -140,40 +144,86 @@ function updateStats() {
 }
 
 function updateHeatmap() {
-    const salesByYearMonth = d3.rollup(state.filteredData,
-        v => d3.sum(v, d => d.sales),
-        d => d.year,
-        d => d.month
-    );
-
+    // Obtener años únicos ordenados
     const years = [...new Set(state.filteredData.map(d => d.year))].sort();
     const months = Array.from({length: 12}, (_, i) => i + 1);
     
-    const z = months.map(month => 
-        years.map(year => salesByYearMonth.get(year)?.get(month) || 0)
-    );
+    // Crear matriz de ventas por mes y año
+    const salesMatrix = months.map(month => {
+        return years.map(year => {
+            const salesForYearMonth = state.filteredData
+                .filter(d => d.year === year && d.month === month)
+                .reduce((sum, d) => sum + d.sales, 0);
+            return salesForYearMonth;
+        });
+    });
 
     const data = [{
-        z: z,
+        z: salesMatrix,
         x: years,
-        y: months,
+        y: config.months,
         type: 'heatmap',
         colorscale: [
             [0, config.colors.white],
             [1, config.colors.primary]
-        ]
+        ],
+        hoverongaps: false,
+        hovertemplate: 
+            'Año: %{x}<br>' +
+            'Mes: %{y}<br>' +
+            'Ventas: %{z:,.0f}€<extra></extra>'
     }];
 
     const layout = {
-        title: 'Distribución de Ventas por Mes y Año',
-        xaxis: { title: 'Año' },
-        yaxis: { title: 'Mes' }
+        title: {
+            text: 'Distribución de Ventas por Mes y Año',
+            font: { size: 16 }
+        },
+        xaxis: {
+            title: 'Año',
+            type: 'category',
+            tickmode: 'array',
+            ticktext: years,
+            tickvals: years,
+            tickangle: 0
+        },
+        yaxis: {
+            title: 'Mes',
+            type: 'category',
+            tickmode: 'array',
+            ticktext: config.months,
+            tickvals: config.months
+        },
+        margin: {
+            l: 150,  // Margen izquierdo aumentado para nombres de meses
+            r: 50,
+            b: 50,
+            t: 50,
+            pad: 4
+        },
+        annotations: [],
+        coloraxis: {
+            colorbar: {
+                title: 'Ventas (€)',
+                tickformat: ',.0f'
+            }
+        }
     };
 
-    Plotly.newPlot('heatmap', data, layout);
+    const plotConfig = {
+        responsive: true,
+        displayModeBar: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ['lasso2d', 'select2d']
+    };
+
+    Plotly.newPlot('heatmap', data, layout, plotConfig);
 }
 
 function updateStackedBar() {
+    // Obtener años únicos ordenados
+    const years = [...new Set(state.filteredData.map(d => d.year))].sort();
+
     const data = Array.from(
         d3.group(state.filteredData, d => d.country),
         ([country, values]) => {
@@ -182,8 +232,8 @@ function updateStackedBar() {
                 d => d.year
             );
             return {
-                x: [...yearSales.keys()],
-                y: [...yearSales.values()],
+                x: years, // Usar array de años ordenado
+                y: years.map(year => yearSales.get(year) || 0), // Mapear ventas para cada año
                 name: country,
                 type: 'bar'
             };
@@ -193,11 +243,29 @@ function updateStackedBar() {
     const layout = {
         barmode: 'stack',
         title: 'Ventas por País y Año',
-        xaxis: { title: 'Año' },
-        yaxis: { title: 'Ventas (€)' }
+        xaxis: {
+            title: 'Año',
+            type: 'category',
+            tickmode: 'array',
+            ticktext: years,
+            tickvals: years,
+            tickangle: 0
+        },
+        yaxis: {
+            title: 'Ventas (€)',
+            tickformat: ',.0f'
+        },
+        hovertemplate: '%{y:,.0f}€<extra>%{data.name}</extra>'
     };
 
-    Plotly.newPlot('stackedBar', data, layout);
+    const config = {
+        responsive: true,
+        displayModeBar: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ['lasso2d', 'select2d']
+    };
+
+    Plotly.newPlot('stackedBar', data, layout, config);
 }
 
 function updateLineChart() {
