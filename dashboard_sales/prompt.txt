@@ -1,0 +1,44 @@
+Actúa como un experto desarrollador de soluciones interactivas para el mercado retail, especializado en análisis de ventas y visualización de datos. Tu tarea es generar un dashboard HTML interactivo y autónomo utilizando Plotly.js, diseñado específicamente para MarketPlace Pelejebre, un retailer de vinos a domicilio en Europa.
+
+*Propósito de la solución*
+Este dashboard debe ser una herramienta estratégica de análisis de ventas que permita a los equipos de MarketPlace Pelejebre:
+- Tomar decisiones informadas sobre demanda y tendencias de ventas.
+- Identificar patrones de consumo por país, producto y periodo de tiempo.
+- Evaluar el impacto de estrategias de ventas y promociones en distintos mercados.
+- Optimizar la gestión de inventarios y logística en función del comportamiento de compra.
+
+*Especificaciones del dashboard*
+(1) Carga y procesamiento de datos
+- Los datos se encuentran en un archivo "historico.csv" ubicado en la raíz del directorio donde se alojará el HTML.
+- El CSV contiene las columnas: Año, Mes, País, Producto, Ventas (Euros) con datos desde 2020 hasta 2024.
+- La carga de datos debe realizarse de forma asíncrona mediante fetch API y d3.js para garantizar un rendimiento óptimo.
+- Manejo de errores con mensajes amigables si los datos no se cargan correctamente.
+
+(2) Componentes visuales clave:
+- 📊 Mapa de calor (Heatmap): Representa la distribución de ventas totales por año y mes, permitiendo identificar patrones estacionales.
+- 📈 Gráfica de barras apiladas: Muestra las ventas totales por país y año, destacando el desempeño de cada mercado.
+- 📉 Gráfica de líneas: Visualiza la evolución de las ventas por tipo de producto (vino tinto, vino blanco y cava) a lo largo del tiempo.
+- 🥧 Gráfica de tarta: Indica la proporción de ventas por tipo de producto, ayudando a evaluar la popularidad de cada categoría.
+- 📊 Gráfica de barras comparativa: Permite comparar ventas por país y tipo de producto, útil para identificar preferencias geográficas.
+- 📋 Resumen estadístico:
+-- Total de ventas acumuladas en el periodo.
+-- Producto más vendido en términos de ingresos.
+-- País con mayor rentabilidad.
+- 🗃️ Tabla filtrable: Muestra los datos completos del CSV con opciones de filtrado por año, país y producto.
+
+(3) Interactividad y usabilidad
+- Controles interactivos:
+-- Selectores de año y país para actualizar dinámicamente todas las visualizaciones.
+- Interfaz optimizada para retail analytics:
+-- Animaciones suaves en transiciones de datos.
+-- Filtros dinámicos con actualización en tiempo real.
+- Esquema de colores corporativo:
+-- Rojo vino (#800020), blanco (#FFFFFF) y negro (#000000), reflejando la identidad visual de MarketPlace Pelejebre.
+
+(4) Autosuficiencia y optimización
+- El dashboard debe ser completamente autónomo, sin depender de backend.
+- Código modular, eficiente y optimizado para manejo de grandes volúmenes de datos.
+- Implementación de técnicas de carga diferida (lazy loading) para mejorar el rendimiento.
+
+*Expectativas del resultado final*
+El dashboard debe proporcionar una visión clara, interactiva y accionable del rendimiento de ventas en diferentes países y productos. Debe permitir a los analistas y ejecutivos de MarketPlace Pelejebre explorar fácilmente los datos, detectar tendencias y tomar decisiones estratégicas con rapidez y precisión.
