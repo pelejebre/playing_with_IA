@@ -1,4 +1,124 @@
 Año,Mes,País,Producto,Ventas (Euros)
+2019,1,Francia,Vino Tinto,21000
+2019,1,Francia,Vino Blanco,19000
+2019,1,Alemania,Vino Tinto,20000
+2019,1,Alemania,Cava,14000
+2019,1,Portugal,Vino Blanco,18000
+2019,1,Portugal,Vino Tinto,16000
+2019,1,Portugal,Cava,12000
+2019,1,España,Vino Tinto,22000
+2019,1,España,Vino Blanco,20000
+2019,1,España,Cava,15000
+2019,2,Francia,Vino Tinto,23000
+2019,2,Francia,Vino Blanco,21000
+2019,2,Alemania,Vino Tinto,22000
+2019,2,Alemania,Cava,14500
+2019,2,Portugal,Vino Blanco,20000
+2019,2,Portugal,Vino Tinto,18000
+2019,2,Portugal,Cava,12500
+2019,2,España,Vino Tinto,24000
+2019,2,España,Vino Blanco,22000
+2019,2,España,Cava,15500
+2019,3,Francia,Vino Tinto,25000
+2019,3,Francia,Vino Blanco,23000
+2019,3,Alemania,Vino Tinto,24000
+2019,3,Alemania,Cava,15000
+2019,3,Portugal,Vino Blanco,22000
+2019,3,Portugal,Vino Tinto,20000
+2019,3,Portugal,Cava,13000
+2019,3,España,Vino Tinto,26000
+2019,3,España,Vino Blanco,24000
+2019,3,España,Cava,16000
+2019,4,Francia,Vino Tinto,27000
+2019,4,Francia,Vino Blanco,25000
+2019,4,Alemania,Vino Tinto,26000
+2019,4,Alemania,Cava,15500
+2019,4,Portugal,Vino Blanco,24000
+2019,4,Portugal,Vino Tinto,22000
+2019,4,Portugal,Cava,13500
+2019,4,España,Vino Tinto,28000
+2019,4,España,Vino Blanco,26000
+2019,4,España,Cava,16500
+2019,5,Francia,Vino Tinto,29000
+2019,5,Francia,Vino Blanco,27000
+2019,5,Alemania,Vino Tinto,28000
+2019,5,Alemania,Cava,16000
+2019,5,Portugal,Vino Blanco,26000
+2019,5,Portugal,Vino Tinto,24000
+2019,5,Portugal,Cava,14000
+2019,5,España,Vino Tinto,30000
+2019,5,España,Vino Blanco,28000
+2019,5,España,Cava,17000
+2019,6,Francia,Vino Tinto,31000
+2019,6,Francia,Vino Blanco,29000
+2019,6,Alemania,Vino Tinto,30000
+2019,6,Alemania,Cava,16500
+2019,6,Portugal,Vino Blanco,28000
+2019,6,Portugal,Vino Tinto,26000
+2019,6,Portugal,Cava,14500
+2019,6,España,Vino Tinto,32000
+2019,6,España,Vino Blanco,30000
+2019,6,España,Cava,17500
+2019,7,Francia,Vino Tinto,33000
+2019,7,Francia,Vino Blanco,31000
+2019,7,Alemania,Vino Tinto,32000
+2019,7,Alemania,Cava,17000
+2019,7,Portugal,Vino Blanco,30000
+2019,7,Portugal,Vino Tinto,28000
+2019,7,Portugal,Cava,15000
+2019,7,España,Vino Tinto,34000
+2019,7,España,Vino Blanco,32000
+2019,7,España,Cava,18000
+2019,8,Francia,Vino Tinto,35000
+2019,8,Francia,Vino Blanco,33000
+2019,8,Alemania,Vino Tinto,34000
+2019,8,Alemania,Cava,17500
+2019,8,Portugal,Vino Blanco,32000
+2019,8,Portugal,Vino Tinto,30000
+2019,8,Portugal,Cava,15500
+2019,8,España,Vino Tinto,36000
+2019,8,España,Vino Blanco,34000
+2019,8,España,Cava,18500
+2019,9,Francia,Vino Tinto,37000
+2019,9,Francia,Vino Blanco,35000
+2019,9,Alemania,Vino Tinto,36000
+2019,9,Alemania,Cava,18000
+2019,9,Portugal,Vino Blanco,34000
+2019,9,Portugal,Vino Tinto,32000
+2019,9,Portugal,Cava,16000
+2019,9,España,Vino Tinto,38000
+2019,9,España,Vino Blanco,36000
+2019,9,España,Cava,19000
+2019,10,Francia,Vino Tinto,39000
+2019,10,Francia,Vino Blanco,37000
+2019,10,Alemania,Vino Tinto,38000
+2019,10,Alemania,Cava,18500
+2019,10,Portugal,Vino Blanco,36000
+2019,10,Portugal,Vino Tinto,34000
+2019,10,Portugal,Cava,16500
+2019,10,España,Vino Tinto,40000
+2019,10,España,Vino Blanco,38000
+2019,10,España,Cava,19500
+2019,11,Francia,Vino Tinto,41000
+2019,11,Francia,Vino Blanco,39000
+2019,11,Alemania,Vino Tinto,40000
+2019,11,Alemania,Cava,19000
+2019,11,Portugal,Vino Blanco,38000
+2019,11,Portugal,Vino Tinto,36000
+2019,11,Portugal,Cava,17000
+2019,11,España,Vino Tinto,42000
+2019,11,España,Vino Blanco,40000
+2019,11,España,Cava,20000
+2019,12,Francia,Vino Tinto,43000
+2019,12,Francia,Vino Blanco,41000
+2019,12,Alemania,Vino Tinto,42000
+2019,12,Alemania,Cava,19500
+2019,12,Portugal,Vino Blanco,40000
+2019,12,Portugal,Vino Tinto,38000
+2019,12,Portugal,Cava,17500
+2019,12,España,Vino Tinto,44000
+2019,12,España,Vino Blanco,42000
+2019,12,España,Cava,20500
 2020,1,Francia,Vino Tinto,15000
 2020,1,Francia,Vino Blanco,8000
 2020,1,Alemania,Vino Tinto,12000
@@ -348,3 +468,254 @@ Año,Mes,País,Producto,Ventas (Euros)
 2022,11,Portugal,Cava,20000
 2022,11,España,Vino Tinto,52000
 2022,11,España,Vino Blanco,46000
+2022,11,España,Cava,23000
+2022,12,Francia,Vino Tinto,50000
+2022,12,Francia,Vino Blanco,43000
+2022,12,Alemania,Vino Tinto,47000
+2022,12,Alemania,Cava,22500
+2022,12,Portugal,Vino Blanco,45000
+2022,12,Portugal,Vino Tinto,43000
+2022,12,Portugal,Cava,20500
+2022,12,España,Vino Tinto,53000
+2022,12,España,Vino Blanco,47000
+2022,12,España,Cava,23500
+2023,1,Francia,Vino Tinto,51000
+2023,1,Francia,Vino Blanco,44000
+2023,1,Alemania,Vino Tinto,48000
+2023,1,Alemania,Cava,23000
+2023,1,Portugal,Vino Blanco,46000
+2023,1,Portugal,Vino Tinto,44000
+2023,1,Portugal,Cava,21000
+2023,1,España,Vino Tinto,54000
+2023,1,España,Vino Blanco,48000
+2023,1,España,Cava,24000
+2023,2,Francia,Vino Tinto,52000
+2023,2,Francia,Vino Blanco,45000
+2023,2,Alemania,Vino Tinto,49000
+2023,2,Alemania,Cava,23500
+2023,2,Portugal,Vino Blanco,47000
+2023,2,Portugal,Vino Tinto,45000
+2023,2,Portugal,Cava,21500
+2023,2,España,Vino Tinto,55000
+2023,2,España,Vino Blanco,49000
+2023,2,España,Cava,24500
+2023,3,Francia,Vino Tinto,53000
+2023,3,Francia,Vino Blanco,46000
+2023,3,Alemania,Vino Tinto,50000
+2023,3,Alemania,Cava,24000
+2023,3,Portugal,Vino Blanco,48000
+2023,3,Portugal,Vino Tinto,46000
+2023,3,Portugal,Cava,22000
+2023,3,España,Vino Tinto,56000
+2023,3,España,Vino Blanco,50000
+2023,3,España,Cava,25000
+2023,4,Francia,Vino Tinto,54000
+2023,4,Francia,Vino Blanco,47000
+2023,4,Alemania,Vino Tinto,51000
+2023,4,Alemania,Cava,24500
+2023,4,Portugal,Vino Blanco,49000
+2023,4,Portugal,Vino Tinto,47000
+2023,4,Portugal,Cava,22500
+2023,4,España,Vino Tinto,57000
+2023,4,España,Vino Blanco,51000
+2023,4,España,Cava,25500
+2023,5,Francia,Vino Tinto,55000
+2023,5,Francia,Vino Blanco,48000
+2023,5,Alemania,Vino Tinto,52000
+2023,5,Alemania,Cava,25000
+2023,5,Portugal,Vino Blanco,50000
+2023,5,Portugal,Vino Tinto,48000
+2023,5,Portugal,Cava,23000
+2023,5,España,Vino Tinto,58000
+2023,5,España,Vino Blanco,52000
+2023,5,España,Cava,26000
+2023,6,Francia,Vino Tinto,56000
+2023,6,Francia,Vino Blanco,49000
+2023,6,Alemania,Vino Tinto,53000
+2023,6,Alemania,Cava,25500
+2023,6,Portugal,Vino Blanco,51000
+2023,6,Portugal,Vino Tinto,49000
+2023,6,Portugal,Cava,23500
+2023,6,España,Vino Tinto,59000
+2023,6,España,Vino Blanco,53000
+2023,6,España,Cava,26500
+2023,7,Francia,Vino Tinto,57000
+2023,7,Francia,Vino Blanco,50000
+2023,7,Alemania,Vino Tinto,54000
+2023,7,Alemania,Cava,26000
+2023,7,Portugal,Vino Blanco,52000
+2023,7,Portugal,Vino Tinto,50000
+2023,7,Portugal,Cava,24000
+2023,7,España,Vino Tinto,60000
+2023,7,España,Vino Blanco,54000
+2023,7,España,Cava,27000
+2023,8,Francia,Vino Tinto,58000
+2023,8,Francia,Vino Blanco,51000
+2023,8,Alemania,Vino Tinto,55000
+2023,8,Alemania,Cava,26500
+2023,8,Portugal,Vino Blanco,53000
+2023,8,Portugal,Vino Tinto,51000
+2023,8,Portugal,Cava,24500
+2023,8,España,Vino Tinto,61000
+2023,8,España,Vino Blanco,55000
+2023,8,España,Cava,27500
+2023,9,Francia,Vino Tinto,59000
+2023,9,Francia,Vino Blanco,52000
+2023,9,Alemania,Vino Tinto,56000
+2023,9,Alemania,Cava,27000
+2023,9,Portugal,Vino Blanco,54000
+2023,9,Portugal,Vino Tinto,52000
+2023,9,Portugal,Cava,25000
+2023,9,España,Vino Tinto,62000
+2023,9,España,Vino Blanco,56000
+2023,9,España,Cava,28000
+2023,10,Francia,Vino Tinto,60000
+2023,10,Francia,Vino Blanco,53000
+2023,10,Alemania,Vino Tinto,57000
+2023,10,Alemania,Cava,27500
+2023,10,Portugal,Vino Blanco,55000
+2023,10,Portugal,Vino Tinto,53000
+2023,10,Portugal,Cava,25500
+2023,10,España,Vino Tinto,63000
+2023,10,España,Vino Blanco,57000
+2023,10,España,Cava,28500
+2023,11,Francia,Vino Tinto,61000
+2023,11,Francia,Vino Blanco,54000
+2023,11,Alemania,Vino Tinto,58000
+2023,11,Alemania,Cava,28000
+2023,11,Portugal,Vino Blanco,56000
+2023,11,Portugal,Vino Tinto,54000
+2023,11,Portugal,Cava,26000
+2023,11,España,Vino Tinto,64000
+2023,11,España,Vino Blanco,58000
+2023,11,España,Cava,29000
+2023,12,Francia,Vino Tinto,62000
+2023,12,Francia,Vino Blanco,55000
+2023,12,Alemania,Vino Tinto,59000
+2023,12,Alemania,Cava,28500
+2023,12,Portugal,Vino Blanco,57000
+2023,12,Portugal,Vino Tinto,55000
+2023,12,Portugal,Cava,26500
+2023,12,España,Vino Tinto,65000
+2023,12,España,Vino Blanco,59000
+2023,12,España,Cava,29500
+2024,1,Francia,Vino Tinto,63000
+2024,1,Francia,Vino Blanco,56000
+2024,1,Alemania,Vino Tinto,60000
+2024,1,Alemania,Cava,29000
+2024,1,Portugal,Vino Blanco,58000
+2024,1,Portugal,Vino Tinto,56000
+2024,1,Portugal,Cava,27000
+2024,1,España,Vino Tinto,66000
+2024,1,España,Vino Blanco,60000
+2024,1,España,Cava,30000
+2024,2,Francia,Vino Tinto,64000
+2024,2,Francia,Vino Blanco,57000
+2024,2,Alemania,Vino Tinto,61000
+2024,2,Alemania,Cava,29500
+2024,2,Portugal,Vino Blanco,59000
+2024,2,Portugal,Vino Tinto,57000
+2024,2,Portugal,Cava,27500
+2024,2,España,Vino Tinto,67000
+2024,2,España,Vino Blanco,61000
+2024,2,España,Cava,30500
+2024,3,Francia,Vino Tinto,65000
+2024,3,Francia,Vino Blanco,58000
+2024,3,Alemania,Vino Tinto,62000
+2024,3,Alemania,Cava,30000
+2024,3,Portugal,Vino Blanco,60000
+2024,3,Portugal,Vino Tinto,58000
+2024,3,Portugal,Cava,28000
+2024,3,España,Vino Tinto,68000
+2024,3,España,Vino Blanco,62000
+2024,3,España,Cava,31000
+2024,4,Francia,Vino Tinto,66000
+2024,4,Francia,Vino Blanco,59000
+2024,4,Alemania,Vino Tinto,63000
+2024,4,Alemania,Cava,30500
+2024,4,Portugal,Vino Blanco,61000
+2024,4,Portugal,Vino Tinto,59000
+2024,4,Portugal,Cava,28500
+2024,4,España,Vino Tinto,69000
+2024,4,España,Vino Blanco,63000
+2024,4,España,Cava,31500
+2024,5,Francia,Vino Tinto,67000
+2024,5,Francia,Vino Blanco,60000
+2024,5,Alemania,Vino Tinto,64000
+2024,5,Alemania,Cava,31000
+2024,5,Portugal,Vino Blanco,62000
+2024,5,Portugal,Vino Tinto,60000
+2024,5,Portugal,Cava,29000
+2024,5,España,Vino Tinto,70000
+2024,5,España,Vino Blanco,64000
+2024,5,España,Cava,32000
+2024,6,Francia,Vino Tinto,68000
+2024,6,Francia,Vino Blanco,61000
+2024,6,Alemania,Vino Tinto,65000
+2024,6,Alemania,Cava,31500
+2024,6,Portugal,Vino Blanco,63000
+2024,6,Portugal,Vino Tinto,61000
+2024,6,Portugal,Cava,29500
+2024,6,España,Vino Tinto,71000
+2024,6,España,Vino Blanco,65000
+2024,6,España,Cava,32500
+2024,7,Francia,Vino Tinto,69000
+2024,7,Francia,Vino Blanco,62000
+2024,7,Alemania,Vino Tinto,66000
+2024,7,Alemania,Cava,32000
+2024,7,Portugal,Vino Blanco,64000
+2024,7,Portugal,Vino Tinto,62000
+2024,7,Portugal,Cava,30000
+2024,7,España,Vino Tinto,72000
+2024,7,España,Vino Blanco,66000
+2024,7,España,Cava,33000
+2024,8,Francia,Vino Tinto,70000
+2024,8,Francia,Vino Blanco,63000
+2024,8,Alemania,Vino Tinto,67000
+2024,8,Alemania,Cava,32500
+2024,8,Portugal,Vino Blanco,65000
+2024,8,Portugal,Vino Tinto,63000
+2024,8,Portugal,Cava,30500
+2024,8,España,Vino Tinto,73000
+2024,8,España,Vino Blanco,67000
+2024,8,España,Cava,33500
+2024,9,Francia,Vino Tinto,71000
+2024,9,Francia,Vino Blanco,64000
+2024,9,Alemania,Vino Tinto,68000
+2024,9,Alemania,Cava,33000
+2024,9,Portugal,Vino Blanco,66000
+2024,9,Portugal,Vino Tinto,64000
+2024,9,Portugal,Cava,31000
+2024,9,España,Vino Tinto,74000
+2024,9,España,Vino Blanco,68000
+2024,9,España,Cava,34000
+2024,10,Francia,Vino Tinto,72000
+2024,10,Francia,Vino Blanco,65000
+2024,10,Alemania,Vino Tinto,69000
+2024,10,Alemania,Cava,33500
+2024,10,Portugal,Vino Blanco,67000
+2024,10,Portugal,Vino Tinto,65000
+2024,10,Portugal,Cava,31500
+2024,10,España,Vino Tinto,75000
+2024,10,España,Vino Blanco,69000
+2024,10,España,Cava,34500
+2024,11,Francia,Vino Tinto,73000
+2024,11,Francia,Vino Blanco,66000
+2024,11,Alemania,Vino Tinto,70000
+2024,11,Alemania,Cava,34000
+2024,11,Portugal,Vino Blanco,68000
+2024,11,Portugal,Vino Tinto,66000
+2024,11,Portugal,Cava,32000
+2024,11,España,Vino Tinto,76000
+2024,11,España,Vino Blanco,70000
+2024,11,España,Cava,35000
+2024,12,Francia,Vino Tinto,74000
+2024,12,Francia,Vino Blanco,67000
+2024,12,Alemania,Vino Tinto,71000
+2024,12,Alemania,Cava,34500
+2024,12,Portugal,Vino Blanco,69000
+2024,12,Portugal,Vino Tinto,67000
+2024,12,Portugal,Cava,32500
+2024,12,España,Vino Tinto,77000
+2024,12,España,Vino Blanco,71000
+2024,12,España,Cava,35500
