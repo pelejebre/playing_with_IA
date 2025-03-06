@@ -9,15 +9,22 @@ const state = {
     }
 };
 
-// Configuración de colores
-const colors = {
-    primary: '#800020',
-    white: '#FFFFFF',
-    black: '#000000'
+// Configuración de colores y formato
+const config = {
+    colors: {
+        primary: '#800020',
+        white: '#FFFFFF',
+        black: '#000000'
+    },
+    formatCurrency: new Intl.NumberFormat('es-ES', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    })
 };
 
 // Funciones de utilidad
-const formatCurrency = (value) => `€${value.toLocaleString('es-ES')}`;
 const showLoading = () => document.getElementById('loadingIndicator').style.display = 'block';
 const hideLoading = () => document.getElementById('loadingIndicator').style.display = 'none';
 
@@ -25,23 +32,35 @@ const hideLoading = () => document.getElementById('loadingIndicator').style.disp
 async function loadData() {
     try {
         showLoading();
+        console.log('Iniciando carga de datos...');
         const response = await fetch('historico.csv');
-        const csvData = await response.text();
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const csvText = await response.text();
+        console.log('CSV cargado correctamente');
         
-        state.rawData = d3.csvParse(csvData, d => ({
+        // Parsear CSV usando d3
+        state.rawData = d3.csvParse(csvText, d => ({
             year: +d.Año,
             month: +d.Mes,
             country: d.País,
             product: d.Producto,
-            sales: +d.Ventas
+            sales: +d["Ventas (Euros)"]
         }));
-        
+
+        if (state.rawData.length === 0) {
+            throw new Error('No se encontraron datos en el archivo CSV');
+        }
+
+        console.log('Datos parseados:', state.rawData.length, 'registros');
         state.filteredData = [...state.rawData];
         initializeSelectors();
         updateDashboard();
+        
     } catch (error) {
-        alert('Error al cargar los datos. Por favor, recarga la página.');
-        console.error('Error loading data:', error);
+        console.error('Error al cargar los datos:', error);
+        alert('Error al cargar los datos. Por favor, verifica que el archivo CSV existe y tiene el formato correcto.');
     } finally {
         hideLoading();
     }
@@ -49,6 +68,7 @@ async function loadData() {
 
 // Inicialización de selectores
 function initializeSelectors() {
+    console.log('Inicializando selectores...');
     const years = [...new Set(state.rawData.map(d => d.year))].sort();
     const countries = [...new Set(state.rawData.map(d => d.country))].sort();
     const products = [...new Set(state.rawData.map(d => d.product))].sort();
@@ -65,26 +85,32 @@ function initializeSelectors() {
 
 function populateSelector(id, options) {
     const selector = document.getElementById(id);
+    if (!selector) {
+        console.error(`Selector no encontrado: ${id}`);
+        return;
+    }
     selector.innerHTML = '<option value="all">Todos</option>' +
         options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
 }
 
-// Manejo de filtros
 function handleFilterChange(event) {
-    const filter = event.target.id.replace('Selector', '');
-    state.currentFilters[filter] = event.target.value;
+    const filterType = event.target.id.replace('Selector', '');
+    state.currentFilters[filterType] = event.target.value;
     
+    filterData();
+    updateDashboard();
+}
+
+function filterData() {
     state.filteredData = state.rawData.filter(d => {
         return (state.currentFilters.year === 'all' || d.year === +state.currentFilters.year) &&
                (state.currentFilters.country === 'all' || d.country === state.currentFilters.country) &&
                (state.currentFilters.product === 'all' || d.product === state.currentFilters.product);
     });
-
-    updateDashboard();
 }
 
-// Actualización del dashboard
 function updateDashboard() {
+    console.log('Actualizando dashboard...');
     updateStats();
     updateHeatmap();
     updateStackedBar();
@@ -93,36 +119,38 @@ function updateDashboard() {
     updateDataTable();
 }
 
-// Actualización de estadísticas
 function updateStats() {
     const totalSales = d3.sum(state.filteredData, d => d.sales);
     const salesByProduct = d3.group(state.filteredData, d => d.product);
     const salesByCountry = d3.group(state.filteredData, d => d.country);
 
-    let topProduct = [...salesByProduct.entries()]
-        .map(([product, data]) => ({product, sales: d3.sum(data, d => d.sales)}))
-        .sort((a, b) => b.sales - a.sales)[0];
+    const topProduct = Array.from(salesByProduct, ([key, value]) => ({
+        product: key,
+        sales: d3.sum(value, d => d.sales)
+    })).sort((a, b) => b.sales - a.sales)[0];
 
-    let topCountry = [...salesByCountry.entries()]
-        .map(([country, data]) => ({country, sales: d3.sum(data, d => d.sales)}))
-        .sort((a, b) => b.sales - a.sales)[0];
+    const topCountry = Array.from(salesByCountry, ([key, value]) => ({
+        country: key,
+        sales: d3.sum(value, d => d.sales)
+    })).sort((a, b) => b.sales - a.sales)[0];
 
-    document.getElementById('totalSales').textContent = formatCurrency(totalSales);
-    document.getElementById('topProduct').textContent = topProduct ? topProduct.product : '-';
-    document.getElementById('topCountry').textContent = topCountry ? topCountry.country : '-';
+    document.getElementById('totalSales').textContent = config.formatCurrency.format(totalSales);
+    document.getElementById('topProduct').textContent = topProduct?.product || '-';
+    document.getElementById('topCountry').textContent = topCountry?.country || '-';
 }
 
-// Visualizaciones
 function updateHeatmap() {
-    const heatmapData = d3.group(state.filteredData, d => d.year, d => d.month);
-    const years = [...heatmapData.keys()].sort();
+    const salesByYearMonth = d3.rollup(state.filteredData,
+        v => d3.sum(v, d => d.sales),
+        d => d.year,
+        d => d.month
+    );
+
+    const years = [...new Set(state.filteredData.map(d => d.year))].sort();
     const months = Array.from({length: 12}, (_, i) => i + 1);
     
     const z = months.map(month => 
-        years.map(year => {
-            const sales = heatmapData.get(year)?.get(month);
-            return sales ? d3.sum(sales, d => d.sales) : 0;
-        })
+        years.map(year => salesByYearMonth.get(year)?.get(month) || 0)
     );
 
     const data = [{
@@ -130,59 +158,81 @@ function updateHeatmap() {
         x: years,
         y: months,
         type: 'heatmap',
-        colorscale: [[0, '#FFFFFF'], [1, colors.primary]],
-        hoverongaps: false
+        colorscale: [
+            [0, config.colors.white],
+            [1, config.colors.primary]
+        ]
     }];
 
-    Plotly.newPlot('heatmap', data, {
+    const layout = {
         title: 'Distribución de Ventas por Mes y Año',
-        xaxis: {title: 'Año'},
-        yaxis: {title: 'Mes'}
-    });
+        xaxis: { title: 'Año' },
+        yaxis: { title: 'Mes' }
+    };
+
+    Plotly.newPlot('heatmap', data, layout);
 }
 
 function updateStackedBar() {
-    const data = Array.from(d3.group(state.filteredData, d => d.country), 
-        ([country, values]) => ({
-            x: [...new Set(values.map(d => d.year))].sort(),
-            y: values.map(d => d.sales),
-            name: country,
-            type: 'bar'
-        })
+    const data = Array.from(
+        d3.group(state.filteredData, d => d.country),
+        ([country, values]) => {
+            const yearSales = d3.rollup(values,
+                v => d3.sum(v, d => d.sales),
+                d => d.year
+            );
+            return {
+                x: [...yearSales.keys()],
+                y: [...yearSales.values()],
+                name: country,
+                type: 'bar'
+            };
+        }
     );
 
-    Plotly.newPlot('stackedBar', data, {
+    const layout = {
         barmode: 'stack',
         title: 'Ventas por País y Año',
-        xaxis: {title: 'Año'},
-        yaxis: {title: 'Ventas (€)'}
-    });
+        xaxis: { title: 'Año' },
+        yaxis: { title: 'Ventas (€)' }
+    };
+
+    Plotly.newPlot('stackedBar', data, layout);
 }
 
 function updateLineChart() {
-    const data = Array.from(d3.group(state.filteredData, d => d.product),
-        ([product, values]) => ({
-            x: values.map(d => `${d.year}-${d.month}`),
-            y: values.map(d => d.sales),
-            name: product,
-            type: 'scatter',
-            mode: 'lines+markers'
-        })
+    const data = Array.from(
+        d3.group(state.filteredData, d => d.product),
+        ([product, values]) => {
+            const sorted = values.sort((a, b) => 
+                (a.year * 12 + a.month) - (b.year * 12 + b.month)
+            );
+            return {
+                x: sorted.map(d => `${d.year}-${d.month.toString().padStart(2, '0')}`),
+                y: sorted.map(d => d.sales),
+                name: product,
+                type: 'scatter',
+                mode: 'lines+markers'
+            };
+        }
     );
 
-    Plotly.newPlot('lineChart', data, {
+    const layout = {
         title: 'Evolución de Ventas por Producto',
-        xaxis: {title: 'Fecha'},
-        yaxis: {title: 'Ventas (€)'}
-    });
+        xaxis: { title: 'Fecha' },
+        yaxis: { title: 'Ventas (€)' }
+    };
+
+    Plotly.newPlot('lineChart', data, layout);
 }
 
 function updatePieChart() {
-    const salesByProduct = Array.from(d3.group(state.filteredData, d => d.product),
-        ([product, values]) => ({
-            product,
-            sales: d3.sum(values, d => d.sales)
-        })
+    const salesByProduct = Array.from(
+        d3.rollup(state.filteredData,
+            v => d3.sum(v, d => d.sales),
+            d => d.product
+        ),
+        ([product, sales]) => ({ product, sales })
     );
 
     const data = [{
@@ -190,28 +240,39 @@ function updatePieChart() {
         labels: salesByProduct.map(d => d.product),
         type: 'pie',
         marker: {
-            colors: [colors.primary, '#400010', '#C00030']
+            colors: [config.colors.primary, '#400010', '#C00030']
         }
     }];
 
-    Plotly.newPlot('pieChart', data, {
+    const layout = {
         title: 'Distribución por Producto'
-    });
+    };
+
+    Plotly.newPlot('pieChart', data, layout);
 }
 
 function updateDataTable() {
-    const tbody = document.querySelector('#dataTable tbody');
-    tbody.innerHTML = state.filteredData
-        .map(d => `
-            <tr>
-                <td>${d.year}</td>
-                <td>${d.month}</td>
-                <td>${d.country}</td>
-                <td>${d.product}</td>
-                <td>${formatCurrency(d.sales)}</td>
-            </tr>
-        `)
-        .join('');
+    const table = document.getElementById('dataTable');
+    if (!table) return;
+
+    const headers = ['Año', 'Mes', 'País', 'Producto', 'Ventas'];
+    
+    table.innerHTML = `
+        <thead>
+            <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+            ${state.filteredData.map(d => `
+                <tr>
+                    <td>${d.year}</td>
+                    <td>${d.month}</td>
+                    <td>${d.country}</td>
+                    <td>${d.product}</td>
+                    <td>${config.formatCurrency.format(d.sales)}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    `;
 }
 
 // Inicialización
