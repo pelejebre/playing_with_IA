@@ -64,7 +64,7 @@ async function loadData() {
         
     } catch (error) {
         console.error('Error al cargar los datos:', error);
-        alert('Error al cargar los datos. Por favor, verifica que el archivo CSV existe y tiene el formato correcto.');
+        alert(`Error al cargar los datos: ${error.message}. Por favor, verifica que el archivo CSV existe y tiene el formato correcto.`);
     } finally {
         hideLoading();
     }
