@@ -12,19 +12,19 @@ Este proyecto es un experimento de generación automática de dashboards utiliza
 - **Interacciones**: 3 conversaciones con el LLM
 - **Prompt Original**: Disponible en `prompt.txt` en el repositorio
 
-## � Características
+## ⭐ Características
 
-- � Visualizaciones interactivas:
+- 1️⃣ Visualizaciones interactivas:
   - Mapa de calor de ventas por mes/año
   - Gráfica de barras apiladas por país
   - Evolución temporal de ventas por producto
   - Distribución de ventas en gráfica circular
   - Tabla de datos filtrable
-- � Filtros dinámicos por:
+- 2️⃣ Filtros dinámicos por:
   - Año
   - País
   - Producto
-- 📊 Resumen estadístico:
+- 3️⃣ Resumen estadístico:
   - Ventas totales
   - Producto más vendido
   - País más rentable
@@ -146,16 +146,3 @@ Las contribuciones son bienvenidas. Por favor, sigue estos pasos:
 - Añadir comentarios para código nuevo
 - Actualizar README si es necesario
 - Crear tests para nuevas funcionalidades
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
-
-### Resumen de Licencia MIT
-
-- ✅ Uso comercial
-- ✅ Modificación
-- ✅ Distribución
-- ✅ Uso privado
-- ❗ Sin garantía
-- ❗ Sin responsabilidad
