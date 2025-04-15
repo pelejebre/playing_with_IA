@@ -37,7 +37,7 @@ Las diferentes implementaciones pueden variar en varios aspectos:
 
 | GPT-4 Turbo | Gemini 2.5 Pro | Deepsite |
 |:-----:|:----------:|:---------:|
-| ![GPT-4 Turbo](/images/GPT_4_Turbo.png) | ![Gemini 2.5 Pro](/images/Gemini_2.5_Pro_Preview_03_25.png) | ![Deepsite](/images/Deepsite.png) |
+| ![GPT-4 Turbo](images/GPT_4_Turbo.png) | ![Gemini 2.5 Pro](images/Gemini_2.5_Pro_Preview_03_25.png) | ![Deepsite](images/Deepsite.png) |
 
 ## 📜 Conclusión 🤔
 
