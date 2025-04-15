@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #2c3e50; /* Fondo oscuro moderno */
+            font-family: 'Press Start 2P', cursive; /* Fuente pixelada si está disponible, si no, monospace */
+            margin: 0;
+            flex-direction: column; /* Alinear elementos verticalmente */
+        }
+
+        .game-container {
+            text-align: center;
+            background-color: #34495e; /* Fondo contenedor */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-title {
+            font-size: 2.5em; /* Tamaño grande para el título */
+            margin-bottom: 20px;
+            font-weight: bold;
+            letter-spacing: 2px; /* Espaciado entre letras */
+        }
+
+        /* Estilos individuales para cada letra del título */
+        .game-title span:nth-child(1) { color: #e74c3c; } /* Rojo */
+        .game-title span:nth-child(2) { color: #f1c40f; } /* Amarillo */
+        .game-title span:nth-child(3) { color: #2ecc71; } /* Verde */
+        .game-title span:nth-child(4) { color: #3498db; } /* Azul */
+        .game-title span:nth-child(5) { color: #9b59b6; } /* Morado */
+        .game-title span:nth-child(6) { color: #e67e22; } /* Naranja */
+        .game-title span:nth-child(7) { color: #1abc9c; } /* Turquesa */
+        .game-title span:nth-child(8) { color: #ecf0f1; } /* Blanco */
+        .game-title span:nth-child(9) { color: #f39c12; } /* Naranja más claro */
+
+        #gameCanvas {
+            border: 5px solid #ecf0f1; /* Borde blanco */
+            background-color: #1a252f; /* Fondo del canvas más oscuro */
+            display: block; /* Asegura que el canvas no tenga espacio extra debajo */
+            margin: 0 auto 20px auto; /* Centrado y con margen inferior */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5); /* Sombra interior */
+        }
+
+        #playButton {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-family: 'Press Start 2P', cursive;
+            color: #ffffff;
+            background-color: #2ecc71; /* Verde */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #playButton:hover {
+            background-color: #27ae60; /* Verde más oscuro */
+        }
+
+        #playButton:active {
+            transform: scale(0.95); /* Efecto al presionar */
+        }
+
+        #playButton:disabled {
+            background-color: #95a5a6; /* Gris cuando está deshabilitado */
+            cursor: not-allowed;
+        }
+
+        #message {
+            position: absolute; /* Posicionar sobre el canvas */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #e74c3c; /* Rojo para GAME OVER */
+            font-size: 3em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            display: none; /* Oculto inicialmente */
+            z-index: 10; /* Asegurar que esté por encima del canvas */
+            text-align: center;
+        }
+
+        /* Añadir enlace a fuente pixelada (opcional, requiere conexión a internet) */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1 class="game-title">
+            <span>S</span><span>N</span><span>A</span><span>K</span><span>E</span><span> </span><span>G</span><span>A</span><span>M</span><span>E</span>
+        </h1>
+        <div style="position: relative;"> <canvas id="gameCanvas" width="400" height="400"></canvas>
+            <div id="message">GAME OVER</div>
+        </div>
+        <button id="playButton">PLAY</button>
+    </div>
+
+    <script>
+        class SnakeGame {
+            constructor(canvasId, messageId, buttonId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.messageElement = document.getElementById(messageId);
+                this.playButton = document.getElementById(buttonId);
+
+                this.gridSize = 20; // Tamaño de cada cuadrado de la cuadrícula
+                this.canvasSize = this.canvas.width; // Asumimos que es cuadrado
+                this.tileCount = this.canvasSize / this.gridSize; // Número de cuadrados por fila/columna
+
+                // Estado del juego
+                this.snake = [];
+                this.food = { x: 0, y: 0 };
+                this.dx = this.gridSize; // Desplazamiento inicial en x (derecha)
+                this.dy = 0;            // Desplazamiento inicial en y
+                this.score = 0;
+                this.gameOver = false;
+                this.gameLoopInterval = null;
+                this.baseSpeed = 150; // ms entre movimientos (más bajo = más rápido)
+                this.currentSpeed = this.baseSpeed;
+                this.speedIncrement = 0.95; // Factor para reducir el intervalo (aumentar velocidad)
+                this.changingDirection = false; // Para evitar cambios rápidos y auto-colisión
+                this.winLength = 20; // Longitud para ganar
+
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                // Listener para el teclado
+                document.addEventListener('keydown', this.changeDirection.bind(this));
+                // Listener para el botón PLAY/RESTART
+                this.playButton.addEventListener('click', this.startGame.bind(this));
+            }
+
+            init() {
+                this.snake = [ // Serpiente inicial en el centro
+                    { x: Math.floor(this.tileCount / 2 - 1) * this.gridSize, y: Math.floor(this.tileCount / 2) * this.gridSize },
+                    // { x: Math.floor(this.tileCount / 2 - 2) * this.gridSize, y: Math.floor(this.tileCount / 2) * this.gridSize } // Opcional: empezar con más longitud
+                ];
+                this.dx = this.gridSize; // Mover a la derecha al inicio
+                this.dy = 0;
+                this.score = 0;
+                this.gameOver = false;
+                this.currentSpeed = this.baseSpeed;
+                this.messageElement.style.display = 'none'; // Ocultar mensaje GAME OVER
+                this.playButton.disabled = true; // Deshabilitar botón durante el juego
+                this.playButton.textContent = 'PLAY'; // Resetear texto del botón
+                this.placeFood(); // Colocar la primera comida
+                this.changingDirection = false; // Permitir cambio de dirección inicial
+
+                // Limpiar intervalo anterior si existe
+                if (this.gameLoopInterval) {
+                    clearInterval(this.gameLoopInterval);
+                }
+            }
+
+            startGame() {
+                this.init(); // Inicializa o resetea el estado del juego
+                this.gameLoopInterval = setInterval(this.gameLoop.bind(this), this.currentSpeed);
+            }
+
+            gameLoop() {
+                if (this.gameOver) {
+                    this.endGame();
+                    return;
+                }
+                 this.changingDirection = false; // Permitir nuevo cambio de dirección después de mover
+                this.clearCanvas();
+                this.moveSnake();
+                // Comprobación de victoria antes de dibujar
+                if (this.snake.length >= this.winLength) {
+                     this.winGame();
+                     return;
+                }
+                this.checkCollision(); // Comprobar colisiones después de mover
+                 // Si hubo colisión, checkCollision pondrá gameOver a true y se manejará en la siguiente iteración
+                if (!this.gameOver) {
+                    this.drawFood();
+                    this.drawSnake();
+                }
+            }
+
+            clearCanvas() {
+                // Fondo negro semi-transparente para efecto de movimiento (opcional)
+                // this.ctx.fillStyle = 'rgba(26, 37, 47, 0.8)';
+                // this.ctx.fillRect(0, 0, this.canvasSize, this.canvasSize);
+
+                // O limpiar completamente
+                 this.ctx.fillStyle = '#1a252f'; // Color de fondo del canvas
+                 this.ctx.fillRect(0, 0, this.canvasSize, this.canvasSize);
+            }
+
+            moveSnake() {
+                const head = { x: this.snake[0].x + this.dx, y: this.snake[0].y + this.dy };
+                this.snake.unshift(head); // Añadir nueva cabeza
+
+                // Comprobar si comió la comida
+                const didEatFood = head.x === this.food.x && head.y === this.food.y;
+
+                if (didEatFood) {
+                    this.score++;
+                    this.placeFood(); // Colocar nueva comida
+
+                    // Aumentar velocidad progresivamente (opcional)
+                    if (this.score > 0 && this.score % 3 === 0) { // Aumentar velocidad cada 3 comidas
+                       this.increaseSpeed();
+                    }
+                } else {
+                    this.snake.pop(); // Quitar la cola si no comió
+                }
+            }
+
+             increaseSpeed() {
+                clearInterval(this.gameLoopInterval); // Detener el loop actual
+                this.currentSpeed *= this.speedIncrement; // Reducir el intervalo (aumentar velocidad)
+                // Asegurarse de que la velocidad no sea demasiado rápida
+                this.currentSpeed = Math.max(this.currentSpeed, 50); // Límite de velocidad (50ms)
+                this.gameLoopInterval = setInterval(this.gameLoop.bind(this), this.currentSpeed); // Reiniciar con nueva velocidad
+            }
+
+
+            changeDirection(event) {
+                 if (this.changingDirection) return; // Si ya cambió en este tick, ignorar
+
+                const LEFT_KEY = 37;
+                const RIGHT_KEY = 39;
+                const UP_KEY = 38;
+                const DOWN_KEY = 40;
+
+                const keyPressed = event.keyCode;
+
+                const goingUp = this.dy === -this.gridSize;
+                const goingDown = this.dy === this.gridSize;
+                const goingRight = this.dx === this.gridSize;
+                const goingLeft = this.dx === -this.gridSize;
+
+                 this.changingDirection = true; // Marcar que se ha cambiado de dirección
+
+                // Cambiar dirección, evitando la inversión directa
+                if (keyPressed === LEFT_KEY && !goingRight) {
+                    this.dx = -this.gridSize;
+                    this.dy = 0;
+                } else if (keyPressed === UP_KEY && !goingDown) {
+                    this.dx = 0;
+                    this.dy = -this.gridSize;
+                } else if (keyPressed === RIGHT_KEY && !goingLeft) {
+                    this.dx = this.gridSize;
+                    this.dy = 0;
+                } else if (keyPressed === DOWN_KEY && !goingUp) {
+                    this.dx = 0;
+                    this.dy = this.gridSize;
+                } else {
+                     this.changingDirection = false; // No hubo cambio válido
+                }
+            }
+
+            placeFood() {
+                let foodX, foodY;
+                // Generar coordenadas hasta encontrar una posición libre
+                while (true) {
+                    foodX = Math.floor(Math.random() * this.tileCount) * this.gridSize;
+                    foodY = Math.floor(Math.random() * this.tileCount) * this.gridSize;
+                    // Comprobar si la comida está sobre la serpiente
+                    let collision = false;
+                    for (const segment of this.snake) {
+                        if (segment.x === foodX && segment.y === foodY) {
+                            collision = true;
+                            break;
+                        }
+                    }
+                    if (!collision) break; // Si no hay colisión, la posición es válida
+                }
+                this.food = { x: foodX, y: foodY };
+            }
+
+            checkCollision() {
+                const head = this.snake[0];
+
+                // Colisión con paredes
+                const hitLeftWall = head.x < 0;
+                const hitRightWall = head.x >= this.canvasSize;
+                const hitTopWall = head.y < 0;
+                const hitBottomWall = head.y >= this.canvasSize;
+
+                if (hitLeftWall || hitRightWall || hitTopWall || hitBottomWall) {
+                    this.gameOver = true;
+                    return;
+                }
+
+                // Colisión consigo misma
+                for (let i = 1; i < this.snake.length; i++) {
+                    if (head.x === this.snake[i].x && head.y === this.snake[i].y) {
+                        this.gameOver = true;
+                        return;
+                    }
+                }
+            }
+
+             winGame() {
+                clearInterval(this.gameLoopInterval);
+                this.messageElement.textContent = "YOU WIN!"; // Mensaje de victoria
+                this.messageElement.style.color = '#2ecc71'; // Color verde para victoria
+                this.messageElement.style.display = 'block';
+                this.playButton.disabled = false; // Habilitar botón para reiniciar
+                this.playButton.textContent = 'RESTART';
+                 // Dibujar la serpiente final en verde (opcional)
+                this.drawSnake(true); // Pasar 'true' para forzar color verde
+                this.drawFood(); // Dibujar la última comida por si acaso
+            }
+
+            endGame() {
+                clearInterval(this.gameLoopInterval); // Detener el bucle
+                this.messageElement.textContent = "GAME OVER"; // Mensaje de derrota
+                this.messageElement.style.color = '#e74c3c'; // Color rojo para derrota
+                this.messageElement.style.display = 'block'; // Mostrar mensaje
+                this.playButton.disabled = false; // Habilitar botón para reiniciar
+                this.playButton.textContent = 'RESTART';
+
+                // Volver a dibujar la serpiente en rojo para mostrar el estado final
+                this.clearCanvas();
+                this.drawFood(); // Mantener la comida visible
+                this.drawSnake(); // drawSnake usará el color rojo porque gameOver es true
+            }
+
+            drawSnake(forceGreen = false) {
+                 // Si gameOver es true y no se fuerza verde, usar rojo. Si no, verde.
+                this.ctx.fillStyle = (this.gameOver && !forceGreen) ? '#e74c3c' : '#2ecc71'; // Rojo en Game Over, si no Verde
+                this.ctx.strokeStyle = '#1a252f'; // Borde oscuro para segmentos
+
+                this.snake.forEach(segment => {
+                    this.ctx.fillRect(segment.x, segment.y, this.gridSize, this.gridSize);
+                     // Añadir un borde ligero para separar segmentos visualmente
+                    this.ctx.strokeRect(segment.x, segment.y, this.gridSize, this.gridSize);
+                });
+
+                // Opcional: Dibujar la cabeza de otro color
+                 if (this.snake.length > 0) {
+                     const head = this.snake[0];
+                      this.ctx.fillStyle = (this.gameOver && !forceGreen) ? '#c0392b' : '#27ae60'; // Rojo más oscuro / Verde más oscuro para la cabeza
+                      this.ctx.fillRect(head.x, head.y, this.gridSize, this.gridSize);
+                     this.ctx.strokeRect(head.x, head.y, this.gridSize, this.gridSize);
+                 }
+            }
+
+            drawFood() {
+                this.ctx.fillStyle = '#f1c40f'; // Color amarillo para la comida
+                this.ctx.strokeStyle = '#c0392b'; // Borde rojo oscuro
+                this.ctx.fillRect(this.food.x, this.food.y, this.gridSize, this.gridSize);
+                 this.ctx.strokeRect(this.food.x, this.food.y, this.gridSize, this.gridSize);
+            }
+        }
+
+        // Esperar a que el DOM esté cargado para inicializar el juego
+        window.onload = () => {
+            const game = new SnakeGame('gameCanvas', 'message', 'playButton');
+            // Opcionalmente, dibujar un estado inicial antes de presionar PLAY
+             game.clearCanvas(); // Limpia el canvas inicial
+             // Podrías dibujar un mensaje "Press PLAY" o algo similar aquí si quisieras
+        };
+
+    </script>
+
+</body>
+</html>

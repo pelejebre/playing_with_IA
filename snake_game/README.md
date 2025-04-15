@@ -58,6 +58,7 @@ Diferentes modelos de lenguaje pueden responder de manera variable a un mismo `p
 | Claude 3.5  | ⭐⭐⭐⭐               | ✅           | NO                | ⭐⭐⭐⭐ |  
 | DeepSeek R1 | ⭐                | ❌           | YES                | ⭐ |                    
 | Gemini 2.0  | ⭐⭐               | ✅           | SOME                | ⭐⭐⭐ | 
+| Gemini 2.5 Pro  | ⭐⭐⭐⭐               | ✅           | NO                | ⭐⭐⭐⭐ | 
 | Llama 3.3   | ⭐⭐⭐⭐                | ✅          | SOME                | ⭐⭐⭐ | 
 | Phi 4       | ⭐⭐⭐               | ✅           | ❌                | ⭐⭐⭐ | 
 | Qwen 2.5    | ⭐                | ❌         | YES                | ⭐ | 
@@ -80,7 +81,7 @@ Diferentes modelos de lenguaje pueden responder de manera variable a un mismo `p
 
 El juego **SNAKE** ofrece múltiples enfoques de implementación, desde simples bucles hasta complejas redes neuronales. Cada solución tiene sus ventajas y desafíos, y su elección depende del contexto de aplicación.
 
-En este experimento, se ha analizado la influencia de distintos **LLMs** en la generación de código, permitiendo comparar su capacidad para optimizar, estructurar y mejorar las soluciones propuestas. Se ha evidenciado que grandes modelos como **GPT-4** y **Claude 3.5** son los más destacados en términos de capacidad para generar código `HTML` para juegos, con una excelente interpretación del prompt y una jugabilidad efectiva 🎮.
+En este experimento, se ha analizado la influencia de distintos **LLMs** en la generación de código, permitiendo comparar su capacidad para optimizar, estructurar y mejorar las soluciones propuestas. Se ha evidenciado que grandes modelos como **GPT-4**, **Gemini 2.5 Pro** y **Claude 3.5** son los más destacados en términos de capacidad para generar código `HTML` para juegos, con una excelente interpretación del prompt y una jugabilidad efectiva 🎮.
 
 Por otro lado, modelos que han sido entrenados con datos de código pueden generar soluciones preexistentes en lugar de crear una nueva implementación basada en el prompt, lo que puede derivar en un cierto sesgo de *overfitting*. Evaluar estas herramientas en escenarios prácticos ayuda a entender sus beneficios y limitaciones en el desarrollo de software.
 
@@ -95,6 +96,7 @@ A continuación, encontrarás los enlaces a los archivos HTML generados para cad
 - <a href="snake_game_by_Claude_3.5_Sonnet .html" target="_blank">Juego SNAKE - Implementación Claude 3.5 Sonnet</a>
 - <a href="snake_game_by_DeepSeek_R1.html" target="_blank">Juego SNAKE - Implementación DeepSeek R1</a>
 - <a href="snake_game_by_Gemini_2.0_Flash.html" target="_blank">Juego SNAKE - Implementación Gemini 2.0 Flash</a>
+- <a href="snake_game_by_Gemini_2.5_Pro.html" target="_blank">Juego SNAKE - Implementación Gemini 2.5 Pro</a>
 - <a href="snake_game_by_Llama3.3-70b.html" target="_blank">Juego SNAKE - Implementación Llama 3.3 70b</a>
 - <a href="snake_game_by_Phi4.html" target="_blank">Juego SNAKE - Implementación Phi 4</a>
 - <a href="snake_game_by_Qwen2.5-Coder-32b.html" target="_blank">Juego SNAKE - Implementación Qwen 2.5 Coder 32b</a>
