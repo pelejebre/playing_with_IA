@@ -73,7 +73,7 @@ Diferentes modelos de lenguaje pueden responder de manera variable a un mismo `p
 
 | Gemini 2.0 | Llama 3.3 | Phi 4 | Qwen 2.5 |
 |:-----:|:----------:|:---------:|:---------:|
-| ![Gemini](images/Gemini_2.0_Flash.png) | ![Llama](images/Llama3.3-70b.png) | ![Phi4](images/Phi4.png) | ![Phi](images/Phi.png) | ![Qwen](images/Qwen2.5-Coder-32b.png) |
+| ![Gemini](images/Gemini_2.0_Flash.png) | ![Llama](images/Llama3.3-70b.png) | ![Phi4](images/Phi4.png) | ![Qwen](images/Qwen2.5-Coder-32b.png) |
 
 ---
 
