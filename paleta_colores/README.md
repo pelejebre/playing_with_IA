@@ -27,17 +27,17 @@ Las diferentes implementaciones pueden variar en varios aspectos:
 
 ## 📊 Comparativa entre implementaciones
 
-| Implementación        | Algoritmo            | Framework CSS | Edición de Colores | Compartir | Rendimiento |  |
+| Implementación        | Algoritmo            | Framework CSS | Edición de Colores | Compartir | Rendimiento |
 | --------------------- | -------------------- | ------------ | ------------------ | --------- | ----------- |
 | GPT-4 Turbo           | Color Thief (CDN)    | Vanilla CSS  | ✅                 | ✅        | ⭐⭐⭐⭐       |
 | Gemini 2.5 Pro        | Color Thief (Integrado)| Vanilla CSS  | ✅                 | ✅        | ⭐⭐⭐⭐⭐     |
-| Deepsite              | Color Thief (CDN)    | Tailwind CSS | ✅                 | ✅        | ⭐⭐⭐⭐     |
+| Deepsite              | Color Thief (CDN)    | Tailwind CSS | ✅                 | ✅        | ⭐⭐⭐⭐       |
 
 ## 📸 Screenshots
 
 | GPT-4 Turbo | Gemini 2.5 Pro | Deepsite |
 |:-----:|:----------:|:---------:|
-| ![GPT-4 Turbo](../images/GPT_4_Turbo.png) | ![Gemini 2.5 Pro](../images/Gemini_2.5_Pro_Preview_03_25.png) | ![Deepsite](../images/Deepsite.png) |
+| ![GPT-4 Turbo](/images/GPT_4_Turbo.png) | ![Gemini 2.5 Pro](/images/Gemini_2.5_Pro_Preview_03_25.png) | ![Deepsite](/images/Deepsite.png) |
 
 ## 📜 Conclusión 🤔
 
