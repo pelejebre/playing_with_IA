@@ -69,11 +69,11 @@ Diferentes modelos de lenguaje pueden responder de manera variable a un mismo `p
 
 | GPT-4 | Claude 3.5 | DeepSeek R1 |
 |:-----:|:----------:|:---------:|
-| ![GPT-4](../images/GPT-4o.png) | ![Claude](../images/Claude_3.5.png) | ![DeepSeek](../images/DeepSeek_R1.png) |
+| ![GPT-4](images/GPT-4o.png) | ![Claude](images/Claude_3.5.png) | ![DeepSeek](images/DeepSeek_R1.png) |
 
 | Gemini 2.0 | Llama 3.3 | Phi 4 | Qwen 2.5 |
 |:-----:|:----------:|:---------:|:---------:|
-| ![Gemini](../images/Gemini_2.0_Flash.png) | ![Llama](../images/Llama3.3-70b.png) | ![Phi4](../images/Phi4.png) | ![Qwen](../images/Phi.png) | ![Phi](../images/Qwen2.5-Coder-32b.png) |
+| ![Gemini](images/Gemini_2.0_Flash.png) | ![Llama](images/Llama3.3-70b.png) | ![Phi4](images/Phi4.png) | ![Qwen](images/Phi.png) | ![Phi](images/Qwen2.5-Coder-32b.png) |
 
 ---
 
