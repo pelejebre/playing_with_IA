@@ -1,0 +1,32 @@
+Desarrolla una aplicación web llamada "Extractor de paleta de colores" utilizando únicamente HTML, CSS y JavaScript (puedes incluir librerías JavaScript como Color Thief o Vibrant.js para el análisis de color). La app debe ser completamente funcional sin frameworks backend, ejecutándose en el navegador.
+
+Funcionalidad principal:
+El usuario puede subir una imagen desde su dispositivo mediante un botón llamado "Subir imagen".
+
+La imagen cargada debe visualizarse en un recuadro de vista previa.
+
+La aplicación debe analizar los colores predominantes de la imagen (mediante análisis de píxeles o librerías especializadas).
+
+Se deben generar al menos 5 colores predominantes, visualizados como bloques cuadrados, cada uno mostrando:
+
+Su color como fondo del bloque
+
+El código HEX
+
+El código RGB
+
+Características adicionales:
+Edición manual: El usuario puede ajustar los colores propuestos (por ejemplo, usando un input tipo color).
+
+Guardar paleta: Permite guardar la paleta generada localmente (por ejemplo, descargando un archivo .json o .png con la paleta).
+
+Compartir: Genera un enlace único que codifica los colores seleccionados en la URL (por ejemplo: ?palette=#ff0000,#00ff00,#0000ff,...) para que otros puedan visualizar la misma paleta.
+
+Diseño responsive y moderno, con una interfaz limpia y amigable (puedes usar CSS Grid o Flexbox para el layout).
+
+Utiliza canvas para leer píxeles de la imagen si decides implementar el análisis sin librerías externas.
+
+Sugerencias técnicas:
+Para extracción de color, considera usar ColorThief, Vibrant.js o realizar el procesamiento con canvas.getImageData().
+
+Para compartir la paleta, codifica los valores en la URL con URLSearchParams.
