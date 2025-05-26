@@ -134,6 +134,20 @@
             margin-top: 10px;
             font-style: italic;
         }
+        .analysis-options {
+            margin-bottom: 15px;
+        }
+        .analysis-options label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .analysis-options input[type="checkbox"] {
+            margin-right: 8px;
+            width: auto;
+        }
     </style>
 </head>
 <body>
@@ -198,6 +212,19 @@
             <p class="info-text" id="dateFilterInfo">Selecciona "Filtrar por rango de fechas" para activar el filtrado.</p>
         </div>
 
+        <div class="control-group" id="analysisControls" style="display: none;">
+            <label>5. Análisis de Serie Temporal</label>
+            <div class="analysis-options">
+                <label>
+                    <input type="checkbox" id="showTrend" checked> Mostrar Tendencia
+                </label>
+                <label>
+                    <input type="checkbox" id="showSeasonality" checked> Mostrar Estacionalidad
+                </label>
+            </div>
+            <p class="info-text">Marca las opciones para mostrar el análisis de la serie temporal en el gráfico.</p>
+        </div>
+
         <div id="chartContainer">
             <p class="info-text" id="chartPlaceholder">El gráfico aparecerá aquí una vez selecciones una columna.</p>
         </div>
@@ -217,7 +244,11 @@
         const dateRangeInputs = document.getElementById('dateRangeInputs');
         const dateFilterInfo = document.getElementById('dateFilterInfo');
         const startDateInput = document.getElementById('startDateInput'); 
-        const endDateInput = document.getElementById('endDateInput');   
+        const endDateInput = document.getElementById('endDateInput');
+        
+        const analysisControls = document.getElementById('analysisControls');
+        const showTrendCheckbox = document.getElementById('showTrend');
+        const showSeasonalityCheckbox = document.getElementById('showSeasonality');
 
         let loadedCsvFiles = []; 
         let currentFileDateValues = []; 
@@ -227,7 +258,7 @@
         fileSearch.addEventListener('input', filterFileList);
         fileList.addEventListener('change', handleFileSelection);
         columnSelector.addEventListener('change', setupPlottingControls);
-        chartTypeSelector.addEventListener('change', plotData);
+        chartTypeSelector.addEventListener('change', handleChartTypeChange);
         
         startDateInput.addEventListener('change', handleDateInputChange);
         endDateInput.addEventListener('change', handleDateInputChange);
@@ -236,6 +267,27 @@
         document.querySelectorAll('input[name="dateFilter"]').forEach(radio => {
             radio.addEventListener('change', handleDateFilterChange);
         });
+
+        // Agregar event listeners para los checkboxes de análisis
+        showTrendCheckbox.addEventListener('change', plotData);
+        showSeasonalityCheckbox.addEventListener('change', plotData);
+
+        function handleChartTypeChange() {
+            const selectedChartType = chartTypeSelector.value;
+            
+            // Mostrar/ocultar controles de análisis según el tipo de gráfico
+            if (selectedChartType === 'line') {
+                const selectedFile = loadedCsvFiles.find(f => f.name === fileList.value);
+                const selectedColumn = columnSelector.value;
+                if (selectedFile && selectedColumn) {
+                    analysisControls.style.display = 'block';
+                }
+            } else {
+                analysisControls.style.display = 'none';
+            }
+            
+            plotData();
+        }
 
         function handleFiles(event) {
             const files = Array.from(event.target.files);
@@ -361,7 +413,8 @@
         function resetAllControls() {
             resetColumnSelector();
             resetDateControls(); 
-            resetChartTypeSelector(); 
+            resetChartTypeSelector();
+            resetAnalysisControls();
             Plotly.purge(chartContainer);
             chartPlaceholder.classList.remove('hidden');
             chartPlaceholder.textContent = "Carga archivos para visualizarlos.";
@@ -375,6 +428,12 @@
         function resetChartTypeSelector() {
             chartTypeSelector.disabled = true;
             chartTypeSelector.value = "line";
+        }
+
+        function resetAnalysisControls() {
+            analysisControls.style.display = 'none';
+            showTrendCheckbox.checked = true;
+            showSeasonalityCheckbox.checked = true;
         }
 
         function resetDateControls() {
@@ -429,6 +488,7 @@
             resetColumnSelector();
             resetDateControls(); 
             resetChartTypeSelector();
+            resetAnalysisControls();
             Plotly.purge(chartContainer);
             chartPlaceholder.classList.remove('hidden');
             chartPlaceholder.textContent = "Selecciona una columna para graficar.";
@@ -475,7 +535,8 @@
             const selectedFile = loadedCsvFiles.find(f => f.name === fileList.value);
             const selectedColumnValue = columnSelector.value;
 
-            resetChartTypeSelector(); 
+            resetChartTypeSelector();
+            resetAnalysisControls();
 
             if (!selectedFile || !selectedColumnValue) {
                 plotData(); 
@@ -503,7 +564,13 @@
                 }
             }
 
-            chartTypeSelector.disabled = false; 
+            chartTypeSelector.disabled = false;
+            
+            // Mostrar controles de análisis si el tipo de gráfico es líneas
+            if (chartTypeSelector.value === 'line') {
+                analysisControls.style.display = 'block';
+            }
+            
             plotData(); 
         }
 
@@ -720,44 +787,49 @@
                         marker: { size: 4 }
                     }];
 
-                    // Calcular y agregar tendencia y estacionalidad si hay suficientes datos válidos
+                    // Calcular y agregar tendencia y estacionalidad si hay suficientes datos válidos y están habilitados
                     if (validYValues.length >= 10) {
                         const trend = calculateTrend(validYValues);
-                        const trendSmooth = movingAverage(trend, 5);
                         
-                        plotConfig.push({
-                            x: validXValues,
-                            y: trendSmooth,
-                            type: 'scatter',
-                            mode: 'lines',
-                            name: 'Tendencia',
-                            line: { 
-                                color: 'green',
-                                dash: 'dash',
-                                width: 2
-                            }
-                        });
+                        // Agregar tendencia si está marcado el checkbox
+                        if (showTrendCheckbox.checked) {
+                            const trendSmooth = movingAverage(trend, 5);
+                            plotConfig.push({
+                                x: validXValues,
+                                y: trendSmooth,
+                                type: 'scatter',
+                                mode: 'lines',
+                                name: 'Tendencia',
+                                line: { 
+                                    color: 'green',
+                                    dash: 'dash',
+                                    width: 2
+                                }
+                            });
+                        }
 
-                        // Calcular estacionalidad
-                        const seasonality = calculateSeasonality(validYValues, trend, Math.min(24, Math.floor(validYValues.length / 4)));
-                        const seasonalitySmooth = movingAverage(seasonality, 3);
-                        
-                        // Normalizar estacionalidad para visualización
-                        const meanY = validYValues.reduce((a, b) => a + b, 0) / validYValues.length;
-                        const normalizedSeasonality = seasonalitySmooth.map(val => val !== null ? meanY + val : null);
-                        
-                        plotConfig.push({
-                            x: validXValues,
-                            y: normalizedSeasonality,
-                            type: 'scatter',
-                            mode: 'lines',
-                            name: 'Estacionalidad',
-                            line: { 
-                                color: 'red',
-                                dash: 'dash',
-                                width: 2
-                            }
-                        });
+                        // Agregar estacionalidad si está marcado el checkbox
+                        if (showSeasonalityCheckbox.checked) {
+                            const seasonality = calculateSeasonality(validYValues, trend, Math.min(24, Math.floor(validYValues.length / 4)));
+                            const seasonalitySmooth = movingAverage(seasonality, 3);
+                            
+                            // Normalizar estacionalidad para visualización
+                            const meanY = validYValues.reduce((a, b) => a + b, 0) / validYValues.length;
+                            const normalizedSeasonality = seasonalitySmooth.map(val => val !== null ? meanY + val : null);
+                            
+                            plotConfig.push({
+                                x: validXValues,
+                                y: normalizedSeasonality,
+                                type: 'scatter',
+                                mode: 'lines',
+                                name: 'Estacionalidad',
+                                line: { 
+                                    color: 'red',
+                                    dash: 'dash',
+                                    width: 2
+                                }
+                            });
+                        }
                     }
                     
                     layout.xaxis = { 
