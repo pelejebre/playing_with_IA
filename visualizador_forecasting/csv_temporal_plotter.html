@@ -540,6 +540,81 @@
             return acfValues;
         }
 
+        // Función para calcular la tendencia usando regresión lineal
+        function calculateTrend(data) {
+            const n = data.length;
+            if (n < 2) return new Array(n).fill(null);
+            
+            const xValues = Array.from({length: n}, (_, i) => i);
+            const sumX = xValues.reduce((a, b) => a + b, 0);
+            const sumY = data.reduce((a, b) => a + b, 0);
+            const sumXY = xValues.reduce((sum, x, i) => sum + x * data[i], 0);
+            const sumXX = xValues.reduce((sum, x) => sum + x * x, 0);
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            
+            return xValues.map(x => slope * x + intercept);
+        }
+
+        // Función para calcular la estacionalidad
+        function calculateSeasonality(data, trend, period = 24) {
+            const n = data.length;
+            if (n < period * 2) return new Array(n).fill(null);
+            
+            // Detrended data
+            const detrended = data.map((val, i) => val - trend[i]);
+            
+            // Calculate seasonal pattern
+            const seasonalPattern = new Array(period).fill(0);
+            const counts = new Array(period).fill(0);
+            
+            for (let i = 0; i < n; i++) {
+                const seasonIndex = i % period;
+                seasonalPattern[seasonIndex] += detrended[i];
+                counts[seasonIndex]++;
+            }
+            
+            // Average the seasonal components
+            for (let i = 0; i < period; i++) {
+                if (counts[i] > 0) {
+                    seasonalPattern[i] /= counts[i];
+                }
+            }
+            
+            // Create full seasonal series
+            const seasonal = new Array(n);
+            for (let i = 0; i < n; i++) {
+                seasonal[i] = seasonalPattern[i % period];
+            }
+            
+            return seasonal;
+        }
+
+        // Función para aplicar suavizado de media móvil
+        function movingAverage(data, windowSize = 5) {
+            const result = [];
+            const halfWindow = Math.floor(windowSize / 2);
+            
+            for (let i = 0; i < data.length; i++) {
+                const start = Math.max(0, i - halfWindow);
+                const end = Math.min(data.length - 1, i + halfWindow);
+                let sum = 0;
+                let count = 0;
+                
+                for (let j = start; j <= end; j++) {
+                    if (data[j] !== null && data[j] !== undefined && !isNaN(data[j])) {
+                        sum += data[j];
+                        count++;
+                    }
+                }
+                
+                result[i] = count > 0 ? sum / count : null;
+            }
+            
+            return result;
+        }
+
         function plotData() {
             const selectedFileName = fileList.value;
             const selectedColumn = columnSelector.value;
@@ -621,7 +696,20 @@
                         chartPlaceholder.classList.remove('hidden');
                         return;
                     }
+
+                    // Filtrar valores nulos para los cálculos
+                    const validIndices = [];
+                    const validYValues = [];
+                    const validXValues = [];
                     
+                    lineYValues.forEach((val, index) => {
+                        if (val !== null && val !== undefined && !isNaN(val)) {
+                            validIndices.push(index);
+                            validYValues.push(val);
+                            validXValues.push(xDataForPlot[index]);
+                        }
+                    });
+
                     plotConfig = [{
                         x: xDataForPlot, 
                         y: lineYValues,
@@ -631,12 +719,54 @@
                         line: {shape: 'spline'}, 
                         marker: { size: 4 }
                     }];
+
+                    // Calcular y agregar tendencia y estacionalidad si hay suficientes datos válidos
+                    if (validYValues.length >= 10) {
+                        const trend = calculateTrend(validYValues);
+                        const trendSmooth = movingAverage(trend, 5);
+                        
+                        plotConfig.push({
+                            x: validXValues,
+                            y: trendSmooth,
+                            type: 'scatter',
+                            mode: 'lines',
+                            name: 'Tendencia',
+                            line: { 
+                                color: 'green',
+                                dash: 'dash',
+                                width: 2
+                            }
+                        });
+
+                        // Calcular estacionalidad
+                        const seasonality = calculateSeasonality(validYValues, trend, Math.min(24, Math.floor(validYValues.length / 4)));
+                        const seasonalitySmooth = movingAverage(seasonality, 3);
+                        
+                        // Normalizar estacionalidad para visualización
+                        const meanY = validYValues.reduce((a, b) => a + b, 0) / validYValues.length;
+                        const normalizedSeasonality = seasonalitySmooth.map(val => val !== null ? meanY + val : null);
+                        
+                        plotConfig.push({
+                            x: validXValues,
+                            y: normalizedSeasonality,
+                            type: 'scatter',
+                            mode: 'lines',
+                            name: 'Estacionalidad',
+                            line: { 
+                                color: 'red',
+                                dash: 'dash',
+                                width: 2
+                            }
+                        });
+                    }
+                    
                     layout.xaxis = { 
                         title: 'Fecha-Hora',
                         type: 'category',
                         tickangle: -45
                     };
                     layout.yaxis = { title: selectedColumn };
+                    layout.showlegend = true;
                     break;
                     
                 case 'histogram':
