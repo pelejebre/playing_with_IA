@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visor de CSV con Gráfico Temporal</title>
+    <title>Visor de CSV con Series Temporales</title>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
@@ -148,6 +148,72 @@
             margin-right: 8px;
             width: auto;
         }
+        .metrics-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fdfdfd;
+            display: none;
+        }
+        .metrics-title {
+            font-weight: 600;
+            color: #0056b3;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .metric-card {
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+        .metric-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .metric-value {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+        }
+        .percentiles-container {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+        .percentiles-title {
+            font-weight: 600;
+            color: #0056b3;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+        .percentiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+        }
+        .percentile-item {
+            text-align: center;
+            font-size: 0.85em;
+        }
+        .percentile-label {
+            color: #666;
+            font-size: 0.8em;
+        }
+        .percentile-value {
+            font-weight: 600;
+            color: #333;
+        }
         .outliers-container {
             margin-top: 20px;
             padding: 15px;
@@ -155,6 +221,43 @@
             border-radius: 8px;
             background-color: #fdfdfd;
             display: none;
+        }
+        .outliers-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .outliers-title {
+            font-weight: 600;
+            color: #0056b3;
+            margin: 0;
+        }
+        .download-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .download-btn {
+            padding: 8px 12px;
+            font-size: 0.85em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .download-csv {
+            background-color: #28a745;
+            color: white;
+        }
+        .download-csv:hover {
+            background-color: #218838;
+        }
+        .download-html {
+            background-color: #007bff;
+            color: white;
+        }
+        .download-html:hover {
+            background-color: #0056b3;
         }
         .outliers-table {
             width: 100%;
@@ -179,11 +282,6 @@
         .outliers-table tr:hover {
             background-color: #e8f4fd;
         }
-        .outliers-title {
-            font-weight: 600;
-            color: #0056b3;
-            margin-bottom: 10px;
-        }
         .outliers-summary {
             margin-bottom: 10px;
             font-size: 0.9em;
@@ -194,13 +292,13 @@
 <body>
     <div class="container">
         <header>
-            <h1>Visor Interactivo de Datos CSV</h1>
+            <h1>Visor de datos CSV de Series Temporales</h1>
         </header>
 
         <div class="control-group">
-            <label for="fileUploadButton">1. Cargar Archivos CSV</label>
+            <label for="fileUploadButton">1. Cargar archivos CSV</label>
             <input type="file" id="csvFileInput" accept=".csv" multiple>
-            <button class="file-upload-button" id="fileUploadButton">Seleccionar Archivos CSV</button>
+            <button class="file-upload-button" id="fileUploadButton">Seleccionar archivos CSV</button>
             <p class="info-text">Los archivos cargados aparecerán abajo. Puedes buscar y seleccionar uno.</p>
         </div>
         
@@ -214,24 +312,24 @@
         </div>
 
         <div class="control-group">
-            <label for="columnSelector">2. Seleccionar Columna para Graficar</label>
+            <label for="columnSelector">2. Seleccionar variable a graficar</label>
             <select id="columnSelector" disabled>
                 <option value="">Primero selecciona un archivo CSV</option>
             </select>
         </div>
 
         <div class="control-group">
-            <label for="chartTypeSelector">3. Seleccionar Tipo de Gráfico</label>
+            <label for="chartTypeSelector">3. Seleccionar tipo de gráfico</label>
             <select id="chartTypeSelector" disabled>
-                <option value="line">Líneas (Temporal)</option>
+                <option value="line">Líneas</option>
                 <option value="histogram">Histograma</option>
-                <option value="boxplot">Diagrama de Caja (Boxplot)</option>
+                <option value="boxplot">Boxplot</option>
                 <option value="acf">Autocorrelación (ACF)</option>
             </select>
         </div>
 
         <div class="control-group" id="dateFilterControls" style="display: none;">
-            <label>4. Filtrar por Rango de Fechas</label>
+            <label>4. Filtrar por rango de fechas</label>
             <div class="filter-options">
                 <label>
                     <input type="radio" name="dateFilter" value="all" checked> Mostrar todos los datos
@@ -242,11 +340,11 @@
             </div>
             <div class="date-picker-group disabled" id="dateRangeInputs">
                 <div class="date-picker-item">
-                    <label for="startDateInput">Fecha Inicio:</label>
+                    <label for="startDateInput">Fecha inicio:</label>
                     <input type="date" id="startDateInput" disabled>
                 </div>
                 <div class="date-picker-item">
-                    <label for="endDateInput">Fecha Fin:</label>
+                    <label for="endDateInput">Fecha fin:</label>
                     <input type="date" id="endDateInput" disabled>
                 </div>
             </div>
@@ -257,13 +355,26 @@
             <label>5. Análisis de Serie Temporal</label>
             <div class="analysis-options">
                 <label>
-                    <input type="checkbox" id="showTrend" checked> Mostrar Tendencia
+                    <input type="checkbox" id="showTrend" checked> Mostrar tendencia
                 </label>
                 <label>
-                    <input type="checkbox" id="showSeasonality" checked> Mostrar Estacionalidad
+                    <input type="checkbox" id="showSeasonality" checked> Mostrar estacionalidad
                 </label>
             </div>
             <p class="info-text">Marca las opciones para mostrar el análisis de la serie temporal en el gráfico.</p>
+        </div>
+
+        <div class="metrics-container" id="metricsContainer">
+            <div class="metrics-title" id="metricsTitle">Métricas de Variable</div>
+            <div class="metrics-grid" id="metricsGrid">
+                <!-- Las métricas se generarán dinámicamente aquí -->
+            </div>
+            <div class="percentiles-container">
+                <div class="percentiles-title">Percentiles</div>
+                <div class="percentiles-grid" id="percentilesGrid">
+                    <!-- Los percentiles se generarán dinámicamente aquí -->
+                </div>
+            </div>
         </div>
 
         <div id="chartContainer">
@@ -271,7 +382,13 @@
         </div>
 
         <div class="outliers-container" id="outliersContainer">
-            <div class="outliers-title">Valores Atípicos (Outliers)</div>
+            <div class="outliers-header">
+                <div class="outliers-title">Valores atípicos (Outliers)</div>
+                <div class="download-buttons" id="downloadButtons" style="display: none;">
+                    <button class="download-btn download-csv" id="downloadCsvBtn">Descargar CSV</button>
+                    <button class="download-btn download-html" id="downloadHtmlBtn">Descargar HTML</button>
+                </div>
+            </div>
             <div class="outliers-summary" id="outliersSummary"></div>
             <table class="outliers-table" id="outliersTable">
                 <thead>
@@ -308,12 +425,21 @@
         const showTrendCheckbox = document.getElementById('showTrend');
         const showSeasonalityCheckbox = document.getElementById('showSeasonality');
 
+        const metricsContainer = document.getElementById('metricsContainer');
+        const metricsTitle = document.getElementById('metricsTitle');
+        const metricsGrid = document.getElementById('metricsGrid');
+        const percentilesGrid = document.getElementById('percentilesGrid');
+
         const outliersContainer = document.getElementById('outliersContainer');
         const outliersSummary = document.getElementById('outliersSummary');
         const outliersTableBody = document.getElementById('outliersTableBody');
+        const downloadButtons = document.getElementById('downloadButtons');
+        const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+        const downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
 
         let loadedCsvFiles = []; 
-        let currentFileDateValues = []; 
+        let currentFileDateValues = [];
+        let currentOutliersData = [];
 
         fileUploadButton.addEventListener('click', () => csvFileInput.click());
         csvFileInput.addEventListener('change', handleFiles);
@@ -324,6 +450,10 @@
         
         startDateInput.addEventListener('change', handleDateInputChange);
         endDateInput.addEventListener('change', handleDateInputChange);
+
+        // Event listeners para descarga
+        downloadCsvBtn.addEventListener('click', downloadOutliersAsCSV);
+        downloadHtmlBtn.addEventListener('click', downloadOutliersAsHTML);
 
         // Agregar event listeners para los radio buttons
         document.querySelectorAll('input[name="dateFilter"]').forEach(radio => {
@@ -482,6 +612,7 @@
             resetDateControls(); 
             resetChartTypeSelector();
             resetAnalysisControls();
+            resetMetrics();
             resetOutliersTable();
             Plotly.purge(chartContainer);
             chartPlaceholder.classList.remove('hidden');
@@ -504,10 +635,18 @@
             showSeasonalityCheckbox.checked = true;
         }
 
+        function resetMetrics() {
+            metricsContainer.style.display = 'none';
+            metricsGrid.innerHTML = '';
+            percentilesGrid.innerHTML = '';
+        }
+
         function resetOutliersTable() {
             outliersContainer.style.display = 'none';
             outliersTableBody.innerHTML = '';
             outliersSummary.textContent = '';
+            downloadButtons.style.display = 'none';
+            currentOutliersData = [];
         }
 
         function resetDateControls() {
@@ -563,6 +702,7 @@
             resetDateControls(); 
             resetChartTypeSelector();
             resetAnalysisControls();
+            resetMetrics();
             resetOutliersTable();
             Plotly.purge(chartContainer);
             chartPlaceholder.classList.remove('hidden');
@@ -612,6 +752,7 @@
 
             resetChartTypeSelector();
             resetAnalysisControls();
+            resetMetrics();
             resetOutliersTable();
 
             if (!selectedFile || !selectedColumnValue) {
@@ -795,17 +936,266 @@
             return outliers;
         }
 
+        // Función para calcular métricas estadísticas
+        function calculateMetrics(data, allData, xData, columnName) {
+            if (data.length === 0) return null;
+
+            // Datos válidos (numéricos)
+            const validData = data.filter(val => val !== null && val !== undefined && !isNaN(val));
+            const n = validData.length;
+            const totalData = allData.length;
+            const missingCount = totalData - n;
+
+            if (n === 0) return null;
+
+            // Estadísticas básicas
+            const sortedData = [...validData].sort((a, b) => a - b);
+            const min = sortedData[0];
+            const max = sortedData[n - 1];
+            const sum = validData.reduce((a, b) => a + b, 0);
+            const mean = sum / n;
+
+            // Desviación estándar
+            const variance = validData.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / n;
+            const std = Math.sqrt(variance);
+
+            // Percentiles
+            const getPercentile = (p) => {
+                const index = Math.ceil(n * p / 100) - 1;
+                return sortedData[Math.max(0, Math.min(index, n - 1))];
+            };
+
+            const percentiles = {
+                p5: getPercentile(5),
+                p10: getPercentile(10),
+                p25: getPercentile(25),
+                p50: getPercentile(50), // mediana
+                p75: getPercentile(75),
+                p90: getPercentile(90),
+                p95: getPercentile(95)
+            };
+
+            return {
+                columnName,
+                count: n,
+                totalCount: totalData,
+                missingCount,
+                min,
+                max,
+                mean,
+                std,
+                percentiles
+            };
+        }
+
+        // Función para mostrar las métricas
+        function displayMetrics(metrics) {
+            if (!metrics) {
+                metricsContainer.style.display = 'none';
+                return;
+            }
+
+            metricsTitle.textContent = `Métricas de ${metrics.columnName}`;
+
+            // Métricas principales
+            metricsGrid.innerHTML = `
+                <div class="metric-card">
+                    <div class="metric-label">Registros Válidos</div>
+                    <div class="metric-value">${metrics.count.toLocaleString()}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Valores Faltantes</div>
+                    <div class="metric-value">${metrics.missingCount.toLocaleString()}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Valor Mínimo</div>
+                    <div class="metric-value">${metrics.min.toFixed(3)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Valor Máximo</div>
+                    <div class="metric-value">${metrics.max.toFixed(3)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Valor Medio</div>
+                    <div class="metric-value">${metrics.mean.toFixed(3)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Desviación Estándar</div>
+                    <div class="metric-value">${metrics.std.toFixed(3)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Mediana (P50)</div>
+                    <div class="metric-value">${metrics.percentiles.p50.toFixed(3)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Registros</div>
+                    <div class="metric-value">${metrics.totalCount.toLocaleString()}</div>
+                </div>
+            `;
+
+            // Percentiles
+            percentilesGrid.innerHTML = `
+                <div class="percentile-item">
+                    <div class="percentile-label">P5</div>
+                    <div class="percentile-value">${metrics.percentiles.p5.toFixed(2)}</div>
+                </div>
+                <div class="percentile-item">
+                    <div class="percentile-label">P10</div>
+                    <div class="percentile-value">${metrics.percentiles.p10.toFixed(2)}</div>
+                </div>
+                <div class="percentile-item">
+                    <div class="percentile-label">P25</div>
+                    <div class="percentile-value">${metrics.percentiles.p25.toFixed(2)}</div>
+                </div>
+                <div class="percentile-item">
+                    <div class="percentile-label">P75</div>
+                    <div class="percentile-value">${metrics.percentiles.p75.toFixed(2)}</div>
+                </div>
+                <div class="percentile-item">
+                    <div class="percentile-label">P90</div>
+                    <div class="percentile-value">${metrics.percentiles.p90.toFixed(2)}</div>
+                </div>
+                <div class="percentile-item">
+                    <div class="percentile-label">P95</div>
+                    <div class="percentile-value">${metrics.percentiles.p95.toFixed(2)}</div>
+                </div>
+            `;
+
+            metricsContainer.style.display = 'block';
+        }
+
+        // Función para generar nombre de archivo personalizado
+        function generateFileName(extension) {
+            const selectedColumn = columnSelector.value;
+            const selectedFile = loadedCsvFiles.find(f => f.name === fileList.value);
+            
+            // Obtener fechas del rango actual
+            let startDate = '';
+            let endDate = '';
+            
+            const dateFilterType = document.querySelector('input[name="dateFilter"]:checked').value;
+            
+            if (selectedFile && selectedFile.hasRealDates && dateFilterType === 'range' && 
+                startDateInput.value && endDateInput.value) {
+                // Usar fechas del filtro
+                startDate = startDateInput.value.replace(/-/g, '');
+                endDate = endDateInput.value.replace(/-/g, '');
+            } else if (currentFileDateValues.length > 0) {
+                // Usar fechas de todo el dataset
+                const firstDate = valueToInputDate(currentFileDateValues[0]);
+                const lastDate = valueToInputDate(currentFileDateValues[currentFileDateValues.length - 1]);
+                startDate = firstDate.replace(/-/g, '');
+                endDate = lastDate.replace(/-/g, '');
+            }
+            
+            // Limpiar nombre de variable (quitar caracteres especiales)
+            const cleanColumnName = selectedColumn.replace(/[^\w\s-]/g, '').replace(/\s+/g, '_');
+            
+            return `valores_atipicos_${cleanColumnName}_desde_${startDate}_hasta_${endDate}.${extension}`;
+        }
+
+        // Función para descargar outliers como CSV
+        function downloadOutliersAsCSV() {
+            if (currentOutliersData.length === 0) return;
+
+            const headers = ['Indice', 'Fecha-Hora', 'Valor', 'Tipo'];
+            const csvContent = [
+                headers.join(','),
+                ...currentOutliersData.map(outlier => [
+                    outlier.index + 1,
+                    `"${outlier.dateTime}"`,
+                    outlier.value.toFixed(3),
+                    outlier.type
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', generateFileName('csv'));
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Función para descargar outliers como HTML
+        function downloadOutliersAsHTML() {
+            if (currentOutliersData.length === 0) return;
+
+            const selectedColumn = columnSelector.value;
+            const htmlContent = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valores Atípicos - ${selectedColumn}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #0056b3; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f5f5f5; font-weight: 600; color: #0056b3; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .summary { background-color: #e8f4fd; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Valores Atípicos (Outliers) - ${selectedColumn}</h1>
+    <div class="summary">
+        <strong>Resumen:</strong> Se encontraron ${currentOutliersData.length} valores atípicos.
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Índice</th>
+                <th>Fecha-Hora</th>
+                <th>Valor</th>
+                <th>Tipo</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${currentOutliersData.map(outlier => `
+                <tr>
+                    <td>${outlier.index + 1}</td>
+                    <td>${outlier.dateTime}</td>
+                    <td>${outlier.value.toFixed(3)}</td>
+                    <td>${outlier.type}</td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    <p><em>Generado el ${new Date().toLocaleDateString('es-ES')} a las ${new Date().toLocaleTimeString('es-ES')}</em></p>
+</body>
+</html>`;
+
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', generateFileName('html'));
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         // Función para mostrar la tabla de outliers
         function displayOutliersTable(outliers) {
             outliersTableBody.innerHTML = '';
+            currentOutliersData = outliers;
             
             if (outliers.length === 0) {
                 outliersSummary.textContent = 'No se encontraron valores atípicos en los datos.';
+                downloadButtons.style.display = 'none';
                 outliersContainer.style.display = 'block';
                 return;
             }
             
             outliersSummary.textContent = `Se encontraron ${outliers.length} valores atípicos (outliers).`;
+            downloadButtons.style.display = 'flex';
             
             outliers.forEach((outlier, index) => {
                 const row = document.createElement('tr');
@@ -827,8 +1217,9 @@
             const selectedChartType = chartTypeSelector.value;
             const selectedFile = loadedCsvFiles.find(f => f.name === selectedFileName);
 
-            // Ocultar tabla de outliers por defecto
+            // Ocultar contenedores por defecto
             outliersContainer.style.display = 'none';
+            metricsContainer.style.display = 'none';
 
             if (!selectedFile || !selectedColumn) { 
                 Plotly.purge(chartContainer); 
@@ -877,6 +1268,10 @@
                 const num = parseFloat(String(val).replace(',', '.')); 
                 return isNaN(num) ? null : num; 
             }).filter(val => val !== null); 
+
+            // Calcular y mostrar métricas
+            const metrics = calculateMetrics(numericYValues, yDataForPlot, xDataForPlot, selectedColumn);
+            displayMetrics(metrics);
 
             let plotConfig = [];
             let layout = {
