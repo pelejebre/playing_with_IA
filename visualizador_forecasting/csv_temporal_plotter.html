@@ -112,6 +112,28 @@
             padding: 8px;
             margin-bottom: 5px;
         }
+        .filter-options {
+            margin-bottom: 15px;
+        }
+        .filter-options label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .filter-options input[type="radio"] {
+            margin-right: 8px;
+            width: auto;
+        }
+        .date-picker-group.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        #dateFilterInfo {
+            margin-top: 10px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -143,9 +165,27 @@
             </select>
         </div>
 
-        <div class="control-group hidden" id="dateRangeControls">
-            <label>3. Seleccionar Rango de Fechas (si aplica)</label>
-            <div class="date-picker-group">
+        <div class="control-group">
+            <label for="chartTypeSelector">3. Seleccionar Tipo de Gráfico</label>
+            <select id="chartTypeSelector" disabled>
+                <option value="line">Líneas (Temporal)</option>
+                <option value="histogram">Histograma</option>
+                <option value="boxplot">Diagrama de Caja (Boxplot)</option>
+                <option value="acf">Autocorrelación (ACF)</option>
+            </select>
+        </div>
+
+        <div class="control-group" id="dateFilterControls" style="display: none;">
+            <label>4. Filtrar por Rango de Fechas</label>
+            <div class="filter-options">
+                <label>
+                    <input type="radio" name="dateFilter" value="all" checked> Mostrar todos los datos
+                </label>
+                <label>
+                    <input type="radio" name="dateFilter" value="range"> Filtrar por rango de fechas
+                </label>
+            </div>
+            <div class="date-picker-group disabled" id="dateRangeInputs">
                 <div class="date-picker-item">
                     <label for="startDateInput">Fecha Inicio:</label>
                     <input type="date" id="startDateInput" disabled>
@@ -155,16 +195,7 @@
                     <input type="date" id="endDateInput" disabled>
                 </div>
             </div>
-        </div>
-
-        <div class="control-group">
-            <label for="chartTypeSelector">4. Seleccionar Tipo de Gráfico</label>
-            <select id="chartTypeSelector" disabled>
-                <option value="line">Líneas (Temporal)</option>
-                <option value="histogram">Histograma</option>
-                <option value="boxplot">Diagrama de Caja (Boxplot)</option>
-                <option value="acf">Autocorrelación (ACF)</option>
-            </select>
+            <p class="info-text" id="dateFilterInfo">Selecciona "Filtrar por rango de fechas" para activar el filtrado.</p>
         </div>
 
         <div id="chartContainer">
@@ -182,7 +213,9 @@
         const chartContainer = document.getElementById('chartContainer');
         const chartPlaceholder = document.getElementById('chartPlaceholder');
         
-        const dateRangeControls = document.getElementById('dateRangeControls');
+        const dateFilterControls = document.getElementById('dateFilterControls');
+        const dateRangeInputs = document.getElementById('dateRangeInputs');
+        const dateFilterInfo = document.getElementById('dateFilterInfo');
         const startDateInput = document.getElementById('startDateInput'); 
         const endDateInput = document.getElementById('endDateInput');   
 
@@ -199,11 +232,16 @@
         startDateInput.addEventListener('change', handleDateInputChange);
         endDateInput.addEventListener('change', handleDateInputChange);
 
-                function handleFiles(event) {
+        // Agregar event listeners para los radio buttons
+        document.querySelectorAll('input[name="dateFilter"]').forEach(radio => {
+            radio.addEventListener('change', handleDateFilterChange);
+        });
+
+        function handleFiles(event) {
             const files = Array.from(event.target.files);
             let filesProcessed = 0;
             if (files.length === 0) return;
-        
+
             files.forEach(file => {
                 if (file.name.toLowerCase().endsWith('.csv')) {
                     if (loadedCsvFiles.find(f => f.name === file.name)) {
@@ -214,7 +252,7 @@
                     Papa.parse(file, {
                         header: true,
                         skipEmptyLines: true,
-                        dynamicTyping: false, // Cambiado a false para manejar fechas como strings
+                        dynamicTyping: false,
                         complete: function(results) {
                             const headers = results.meta.fields;
                             if (!headers || headers.length === 0) {
@@ -223,27 +261,23 @@
                                 if (filesProcessed === files.length) updateFileList();
                                 return;
                             }
-        
-                            // Verificar que las primeras dos columnas sean Fecha y Hora
+
                             if (headers.length < 2) {
                                 alert(`El archivo ${file.name} debe tener al menos 2 columnas (Fecha y Hora).`);
                                 filesProcessed++;
                                 if (filesProcessed === files.length) updateFileList();
                                 return;
                             }
-        
+
                             const fechaColumn = headers[0];
                             const horaColumn = headers[1];
                             
-                            // Procesar y ordenar los datos por fecha-hora
                             const processedData = results.data
                                 .filter(row => row[fechaColumn] && row[horaColumn] !== undefined)
                                 .map(row => {
-                                    // Crear datetime combinando fecha y hora
                                     const fechaStr = String(row[fechaColumn]).trim();
                                     const horaNum = parseInt(row[horaColumn]);
                                     
-                                    // Convertir fecha de dd/mm/yyyy a yyyy-mm-dd para crear Date
                                     const fechaParts = fechaStr.split('/');
                                     if (fechaParts.length === 3) {
                                         const [dia, mes, año] = fechaParts;
@@ -261,18 +295,17 @@
                                     return null;
                                 })
                                 .filter(row => row !== null)
-                                .sort((a, b) => a._datetime - b._datetime); // Ordenar por datetime
-        
+                                .sort((a, b) => a._datetime - b._datetime);
+
                             if (processedData.length === 0) {
                                 alert(`No se pudieron procesar las fechas y horas en ${file.name}. Verifica el formato (dd/mm/yyyy para fecha, número entero para hora).`);
                                 filesProcessed++;
                                 if (filesProcessed === files.length) updateFileList();
                                 return;
                             }
-        
-                            // Crear array de fechas-horas para el selector de rangos
+
                             const allDatesForFile = processedData.map(row => row._datetimeString);
-        
+
                             loadedCsvFiles.push({
                                 name: file.name, 
                                 data: processedData, 
@@ -345,9 +378,50 @@
         }
 
         function resetDateControls() {
-            dateRangeControls.classList.add('hidden');
-            [startDateInput, endDateInput].forEach(el => { el.disabled = true; el.value = ''; el.min = ''; el.max = '';});
-            currentFileDateValues = [];
+            // Reset radio buttons
+            document.querySelector('input[name="dateFilter"][value="all"]').checked = true;
+            dateRangeInputs.classList.add('disabled');
+            
+            [startDateInput, endDateInput].forEach(el => { 
+                el.disabled = true; 
+                el.value = ''; 
+                el.min = ''; 
+                el.max = '';
+            });
+            
+            // Solo ocultar el control si NO hay archivo seleccionado o NO tiene fechas válidas
+            const selectedFile = loadedCsvFiles.find(f => f.name === fileList.value);
+            if (!selectedFile || !selectedFile.hasRealDates) {
+                dateFilterControls.style.display = 'none';
+                currentFileDateValues = [];
+            }
+            // Si hay archivo válido, mantener currentFileDateValues
+        }
+
+        function handleDateFilterChange() {
+            const selectedFilter = document.querySelector('input[name="dateFilter"]:checked').value;
+            const selectedFile = loadedCsvFiles.find(f => f.name === fileList.value);
+            
+            if (selectedFilter === 'all') {
+                dateRangeInputs.classList.add('disabled');
+                startDateInput.disabled = true;
+                endDateInput.disabled = true;
+                dateFilterInfo.textContent = "Mostrando todos los datos disponibles.";
+            } else if (selectedFilter === 'range' && selectedFile && selectedFile.hasRealDates) {
+                dateRangeInputs.classList.remove('disabled');
+                startDateInput.disabled = false;
+                endDateInput.disabled = false;
+                dateFilterInfo.textContent = "Selecciona las fechas de inicio y fin para filtrar los datos.";
+                
+                if (!startDateInput.value && currentFileDateValues.length > 0) {
+                    const minDate = valueToInputDate(currentFileDateValues[0]);
+                    const maxDate = valueToInputDate(currentFileDateValues[currentFileDateValues.length - 1]);
+                    startDateInput.value = minDate;
+                    endDateInput.value = maxDate;
+                }
+            }
+            
+            plotData();
         }
 
         function handleFileSelection() {
@@ -367,21 +441,19 @@
                 selectedFile.headers.forEach(h => columnSelector.add(new Option(h, h)));
                 columnSelector.disabled = false;
                 currentFileDateValues = selectedFile.allDates || [];
-                // If a column was previously selected for this file, re-select it and setup controls
-                // This part might need more sophisticated state management if desired
-                if (columnSelector.options.length > 1) {
-                     // Optionally, trigger setupPlottingControls if a default column should be plotted
-                     // or if state needs to be restored. For now, user must select a column.
+                
+                // Mostrar controles de fecha si hay fechas válidas
+                if (selectedFile.hasRealDates && currentFileDateValues.length > 0) {
+                    dateFilterControls.style.display = 'block';
                 }
             }
         }
         
-                function valueToInputDate(value) { 
+        function valueToInputDate(value) { 
             if (value == null) return "";
             
             const dateStr = String(value);
             
-            // Manejar formato "dd/mm/yyyy HH:mm" o "dd/mm/yyyy H"
             const dateTimeMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2})/);
             if (dateTimeMatch) {
                 const [, dia, mes, año, hora] = dateTimeMatch;
@@ -389,7 +461,6 @@
                 return fechaISO;
             }
             
-            // Fallback para otros formatos
             const d = new Date(dateStr);
             if (!isNaN(d.getTime()) && d.toString() !== "Invalid Date") {
                 if (d.getFullYear() > 1000 && d.getFullYear() < 3000) {
@@ -404,7 +475,6 @@
             const selectedFile = loadedCsvFiles.find(f => f.name === fileList.value);
             const selectedColumnValue = columnSelector.value;
 
-            resetDateControls(); 
             resetChartTypeSelector(); 
 
             if (!selectedFile || !selectedColumnValue) {
@@ -412,28 +482,25 @@
                 return;
             }
             
-            // Configure date controls only if the file was determined to have real dates
-            // and currentFileDateValues has items.
+            // Configurar controles de fecha solo si el archivo tiene fechas reales
             if (selectedFile.hasRealDates && currentFileDateValues.length > 0) {
                 const minDateForInput = valueToInputDate(currentFileDateValues[0]);
                 const maxDateForInput = valueToInputDate(currentFileDateValues[currentFileDateValues.length - 1]);
 
                 if (minDateForInput && maxDateForInput) {
-                    dateRangeControls.classList.remove('hidden'); 
+                    dateFilterControls.style.display = 'block';
                     startDateInput.min = minDateForInput;
                     startDateInput.max = maxDateForInput;
-                    startDateInput.value = minDateForInput;
-                    startDateInput.disabled = false; 
+                    
+                    // Solo establecer valores por defecto si no hay valores previos
+                    if (!startDateInput.value) startDateInput.value = minDateForInput;
+                    if (!endDateInput.value) endDateInput.value = maxDateForInput;
                     
                     endDateInput.min = minDateForInput;
                     endDateInput.max = maxDateForInput;
-                    endDateInput.value = maxDateForInput;
-                    endDateInput.disabled = false;
-                } else {
-                    dateRangeControls.classList.add('hidden'); 
+                    
+                    dateFilterInfo.textContent = `Datos disponibles desde ${minDateForInput} hasta ${maxDateForInput}`;
                 }
-            } else {
-                 dateRangeControls.classList.add('hidden'); 
             }
 
             chartTypeSelector.disabled = false; 
@@ -473,34 +540,32 @@
             return acfValues;
         }
 
-
-                function plotData() {
+        function plotData() {
             const selectedFileName = fileList.value;
             const selectedColumn = columnSelector.value;
             const selectedChartType = chartTypeSelector.value;
             const selectedFile = loadedCsvFiles.find(f => f.name === selectedFileName);
-        
+
             if (!selectedFile || !selectedColumn) { 
                 Plotly.purge(chartContainer); 
                 chartPlaceholder.classList.remove('hidden');
                 chartPlaceholder.textContent = "Selecciona un archivo y una columna para graficar.";
-                if (!selectedColumn) dateRangeControls.classList.add('hidden');
                 return; 
             }
-        
+
             if (!selectedFile.data) return;
-        
-            // Usar los datos ya ordenados por datetime
+
             const originalXValues = selectedFile.data.map(row => row._datetimeString);
             const originalYValues = selectedFile.data.map(row => row[selectedColumn]);
             
             let xDataForPlot = [...originalXValues]; 
             let yDataForPlot = [...originalYValues]; 
-        
-            // Filtrar por rango de fechas si está configurado
-            if (selectedFile.hasRealDates && !dateRangeControls.classList.contains('hidden') && 
-                !startDateInput.disabled && startDateInput.value && 
-                !endDateInput.disabled && endDateInput.value) {
+
+            // Filtrar por rango de fechas si está activado
+            const dateFilterType = document.querySelector('input[name="dateFilter"]:checked').value;
+            if (selectedFile.hasRealDates && dateFilterType === 'range' && 
+                startDateInput.value && endDateInput.value && 
+                !startDateInput.disabled && !endDateInput.disabled) {
                 
                 const inputStartDate = startDateInput.value; 
                 const inputEndDate = endDateInput.value;     
@@ -516,27 +581,33 @@
                 }
                 xDataForPlot = filteredIndices.map(i => originalXValues[i]);
                 yDataForPlot = filteredIndices.map(i => originalYValues[i]);
+                
+                if (filteredIndices.length === 0) {
+                    dateFilterInfo.textContent = "No hay datos en el rango de fechas seleccionado.";
+                } else {
+                    dateFilterInfo.textContent = `Mostrando ${filteredIndices.length} de ${originalXValues.length} registros.`;
+                }
             }
             
             const numericYValues = yDataForPlot.map(val => { 
                 const num = parseFloat(String(val).replace(',', '.')); 
                 return isNaN(num) ? null : num; 
             }).filter(val => val !== null); 
-        
+
             let plotConfig = [];
             let layout = {
                 title: `${selectedChartType.charAt(0).toUpperCase() + selectedChartType.slice(1)} para: ${selectedColumn}`,
                 margin: { l: 60, r: 30, b: 80, t: 50 },
                 hovermode: 'closest'
             };
-        
+
             if (numericYValues.length === 0 && selectedChartType !== 'line' && selectedChartType !== 'acf') {
                  Plotly.purge(chartContainer);
                  chartPlaceholder.textContent = "No hay datos numéricos válidos en la columna seleccionada para el rango/tipo especificado.";
                  chartPlaceholder.classList.remove('hidden');
                  return;
             }
-        
+
             switch (selectedChartType) {
                 case 'line':
                     const lineYValues = yDataForPlot.map(val => { 
@@ -650,7 +721,7 @@
                     chartPlaceholder.classList.remove('hidden');
                     return;
             }
-        
+
             if (plotConfig.length > 0 && plotConfig.some(trace => (trace.x && trace.x.length > 0) || (trace.y && trace.y.length > 0))) {
                 chartPlaceholder.classList.add('hidden');
                 Plotly.newPlot(chartContainer, plotConfig, layout, {responsive: true});
@@ -660,7 +731,8 @@
                 chartPlaceholder.classList.remove('hidden');
             }
         }
-        updateFileList(); // Initial call to set up the file list area
+
+        updateFileList();
     </script>
 </body>
 </html>
