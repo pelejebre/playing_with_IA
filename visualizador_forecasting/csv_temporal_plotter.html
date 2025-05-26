@@ -148,6 +148,47 @@
             margin-right: 8px;
             width: auto;
         }
+        .outliers-container {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fdfdfd;
+            display: none;
+        }
+        .outliers-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .outliers-table th,
+        .outliers-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .outliers-table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+            color: #0056b3;
+        }
+        .outliers-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .outliers-table tr:hover {
+            background-color: #e8f4fd;
+        }
+        .outliers-title {
+            font-weight: 600;
+            color: #0056b3;
+            margin-bottom: 10px;
+        }
+        .outliers-summary {
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -228,6 +269,23 @@
         <div id="chartContainer">
             <p class="info-text" id="chartPlaceholder">El gráfico aparecerá aquí una vez selecciones una columna.</p>
         </div>
+
+        <div class="outliers-container" id="outliersContainer">
+            <div class="outliers-title">Valores Atípicos (Outliers)</div>
+            <div class="outliers-summary" id="outliersSummary"></div>
+            <table class="outliers-table" id="outliersTable">
+                <thead>
+                    <tr>
+                        <th>Índice</th>
+                        <th>Fecha-Hora</th>
+                        <th>Valor</th>
+                        <th>Tipo</th>
+                    </tr>
+                </thead>
+                <tbody id="outliersTableBody">
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
@@ -249,6 +307,10 @@
         const analysisControls = document.getElementById('analysisControls');
         const showTrendCheckbox = document.getElementById('showTrend');
         const showSeasonalityCheckbox = document.getElementById('showSeasonality');
+
+        const outliersContainer = document.getElementById('outliersContainer');
+        const outliersSummary = document.getElementById('outliersSummary');
+        const outliersTableBody = document.getElementById('outliersTableBody');
 
         let loadedCsvFiles = []; 
         let currentFileDateValues = []; 
@@ -284,6 +346,11 @@
                 }
             } else {
                 analysisControls.style.display = 'none';
+            }
+
+            // Ocultar tabla de outliers si no es boxplot
+            if (selectedChartType !== 'boxplot') {
+                outliersContainer.style.display = 'none';
             }
             
             plotData();
@@ -415,6 +482,7 @@
             resetDateControls(); 
             resetChartTypeSelector();
             resetAnalysisControls();
+            resetOutliersTable();
             Plotly.purge(chartContainer);
             chartPlaceholder.classList.remove('hidden');
             chartPlaceholder.textContent = "Carga archivos para visualizarlos.";
@@ -434,6 +502,12 @@
             analysisControls.style.display = 'none';
             showTrendCheckbox.checked = true;
             showSeasonalityCheckbox.checked = true;
+        }
+
+        function resetOutliersTable() {
+            outliersContainer.style.display = 'none';
+            outliersTableBody.innerHTML = '';
+            outliersSummary.textContent = '';
         }
 
         function resetDateControls() {
@@ -489,6 +563,7 @@
             resetDateControls(); 
             resetChartTypeSelector();
             resetAnalysisControls();
+            resetOutliersTable();
             Plotly.purge(chartContainer);
             chartPlaceholder.classList.remove('hidden');
             chartPlaceholder.textContent = "Selecciona una columna para graficar.";
@@ -537,6 +612,7 @@
 
             resetChartTypeSelector();
             resetAnalysisControls();
+            resetOutliersTable();
 
             if (!selectedFile || !selectedColumnValue) {
                 plotData(); 
@@ -682,11 +758,77 @@
             return result;
         }
 
+        // Función para calcular outliers usando el método IQR
+        function calculateOutliers(data, xData) {
+            if (data.length === 0) return [];
+            
+            // Ordenar los datos para calcular cuartiles
+            const sortedData = [...data].sort((a, b) => a - b);
+            const n = sortedData.length;
+            
+            // Calcular Q1, Q2 y Q3
+            const q1Index = Math.floor(n * 0.25);
+            const q3Index = Math.floor(n * 0.75);
+            const q1 = sortedData[q1Index];
+            const q3 = sortedData[q3Index];
+            
+            // Calcular IQR
+            const iqr = q3 - q1;
+            
+            // Calcular límites de outliers
+            const lowerBound = q1 - 1.5 * iqr;
+            const upperBound = q3 + 1.5 * iqr;
+            
+            // Encontrar outliers
+            const outliers = [];
+            data.forEach((value, index) => {
+                if (value < lowerBound || value > upperBound) {
+                    outliers.push({
+                        index: index,
+                        value: value,
+                        dateTime: xData[index],
+                        type: value < lowerBound ? 'Inferior' : 'Superior'
+                    });
+                }
+            });
+            
+            return outliers;
+        }
+
+        // Función para mostrar la tabla de outliers
+        function displayOutliersTable(outliers) {
+            outliersTableBody.innerHTML = '';
+            
+            if (outliers.length === 0) {
+                outliersSummary.textContent = 'No se encontraron valores atípicos en los datos.';
+                outliersContainer.style.display = 'block';
+                return;
+            }
+            
+            outliersSummary.textContent = `Se encontraron ${outliers.length} valores atípicos (outliers).`;
+            
+            outliers.forEach((outlier, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${outlier.index + 1}</td>
+                    <td>${outlier.dateTime}</td>
+                    <td>${outlier.value.toFixed(3)}</td>
+                    <td>${outlier.type}</td>
+                `;
+                outliersTableBody.appendChild(row);
+            });
+            
+            outliersContainer.style.display = 'block';
+        }
+
         function plotData() {
             const selectedFileName = fileList.value;
             const selectedColumn = columnSelector.value;
             const selectedChartType = chartTypeSelector.value;
             const selectedFile = loadedCsvFiles.find(f => f.name === selectedFileName);
+
+            // Ocultar tabla de outliers por defecto
+            outliersContainer.style.display = 'none';
 
             if (!selectedFile || !selectedColumn) { 
                 Plotly.purge(chartContainer); 
@@ -801,7 +943,7 @@
                                 mode: 'lines',
                                 name: 'Tendencia',
                                 line: { 
-                                    color: 'green',
+                                    color: 'yellow',
                                     dash: 'dash',
                                     width: 2
                                 }
@@ -873,6 +1015,10 @@
                     }];
                     layout.xaxis = { title: '' };
                     layout.yaxis = { title: selectedColumn };
+
+                    // Calcular y mostrar outliers
+                    const outliers = calculateOutliers(numericYValues, xDataForPlot);
+                    displayOutliersTable(outliers);
                     break;
                     
                 case 'acf':
