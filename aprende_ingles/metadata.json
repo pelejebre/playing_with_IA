@@ -1,0 +1,7 @@
+{
+  "name": "Aprende Inglés con Sparky",
+  "description": "Aprende inglés jugando",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
