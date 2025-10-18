@@ -55,7 +55,10 @@ Diferentes modelos de lenguaje pueden responder de manera variable a un mismo `p
 | Modelo LLM  | Aspecto de la App | Jugabilidad | Requiere Mejoras | Interpretación del Prompt |
 | ----------- | ----------------- | ----------- | ---------------- |------------------------| 
 | GPT-4       | ⭐⭐⭐⭐              | ✅           | NO                | ⭐⭐⭐⭐ |               
-| Claude 3.5  | ⭐⭐⭐⭐               | ✅           | NO                | ⭐⭐⭐⭐ |  
+| GPT-5 Codex | ⭐⭐⭐⭐              | ✅           | NO                | ⭐⭐⭐⭐ |
+| Claude 3.5  | ⭐⭐⭐⭐               | ✅           | NO                | ⭐⭐⭐⭐ |
+| Claude 4.5  | ⭐⭐⭐⭐               | ✅           | NO                | ⭐⭐⭐⭐ |
+| Grok Code Fast1 | ⭐⭐⭐          | ✅           | NO                | ⭐⭐⭐⭐ |
 | DeepSeek R1 | ⭐                | ❌           | YES                | ⭐ |                    
 | Gemini 2.0  | ⭐⭐               | ✅           | SOME                | ⭐⭐⭐ | 
 | Gemini 2.5 Pro  | ⭐⭐⭐⭐               | ✅           | NO                | ⭐⭐⭐⭐ | 
@@ -67,13 +70,17 @@ Diferentes modelos de lenguaje pueden responder de manera variable a un mismo `p
 
 ## 📸 Screenshots
 
-| GPT-4 | Claude 3.5 | DeepSeek R1 | Gemini 2.5 Pro |
+| GPT-4 | GPT-5 Codex | Claude 3.5 | Claude 4.5 |
 |:-----:|:----------:|:---------:|:---------:|
-| ![GPT-4](images/GPT-4o.png) | ![Claude](images/Claude_3.5.png) | ![DeepSeek](images/DeepSeek_R1.png) | ![Gemini 2.5 Pro](images/Gemini_2.5_Pro.png) |
+| <img src="images/GPT-4o.png" height="300"> | <img src="images/GPT_5_Codex.png" height="300"> | <img src="images/Claude_3.5.png" height="300"> | <img src="images/Claude_4.5.png" height="300"> |
 
-| Gemini 2.0 | Llama 3.3 | Phi 4 | Qwen 2.5 |
+| Grok Code Fast1 | DeepSeek R1 | Gemini 2.5 Pro | Gemini 2.0 |
 |:-----:|:----------:|:---------:|:---------:|
-| ![Gemini](images/Gemini_2.0_Flash.png) | ![Llama](images/Llama3.3-70b.png) | ![Phi4](images/Phi4.png) | ![Qwen](images/Qwen2.5-Coder-32b.png) |
+| <img src="images/Grok_Code_Fast1.png" height="300"> | <img src="images/DeepSeek_R1.png" height="300"> | <img src="images/Gemini_2.5_Pro.png" height="300"> | <img src="images/Gemini_2.0_Flash.png" height="300"> |
+
+| Llama 3.3 | Phi 4 | Qwen 2.5 |
+|:-----:|:----------:|:---------:|
+| <img src="images/Llama3.3-70b.png" height="300"> | <img src="images/Phi4.png" height="300"> | <img src="images/Qwen2.5-Coder-32b.png" height="300"> |
 
 ---
 
@@ -81,7 +88,9 @@ Diferentes modelos de lenguaje pueden responder de manera variable a un mismo `p
 
 El juego **SNAKE** ofrece múltiples enfoques de implementación, desde simples bucles hasta complejas redes neuronales. Cada solución tiene sus ventajas y desafíos, y su elección depende del contexto de aplicación.
 
-En este experimento, se ha analizado la influencia de distintos **LLMs** en la generación de código, permitiendo comparar su capacidad para optimizar, estructurar y mejorar las soluciones propuestas. Se ha evidenciado que grandes modelos como **GPT-4**, **Gemini 2.5 Pro** y **Claude 3.5** son los más destacados en términos de capacidad para generar código `HTML` para juegos, con una excelente interpretación del prompt y una jugabilidad efectiva 🎮.
+En este experimento, se ha analizado la influencia de distintos **LLMs** en la generación de código, permitiendo comparar su capacidad para optimizar, estructurar y mejorar las soluciones propuestas. Se ha evidenciado que grandes modelos como **GPT-4**, **GPT-5 Codex**, **Claude 3.5**, **Claude 4.5**, **Grok Code Fast1** y **Gemini 2.5 Pro** son los más destacados en términos de capacidad para generar código `HTML` para juegos, con una excelente interpretación del prompt y una jugabilidad efectiva 🎮.
+
+Los nuevos modelos evaluados (**Claude 4.5**, **GPT-5 Codex** y **Grok Code Fast1**) han demostrado un rendimiento excepcional, con **GPT-5 Codex** y **Claude 4.5** destacándose por su aspecto visual superior y pulido. Los tres modelos nuevos han interpretado correctamente el prompt y han generado código funcional de alta calidad sin necesidad de mejoras adicionales, confirmando la evolución positiva de estas tecnologías.
 
 Por otro lado, modelos que han sido entrenados con datos de código pueden generar soluciones preexistentes en lugar de crear una nueva implementación basada en el prompt, lo que puede derivar en un cierto sesgo de *overfitting*. Evaluar estas herramientas en escenarios prácticos ayuda a entender sus beneficios y limitaciones en el desarrollo de software.
 
@@ -93,7 +102,10 @@ Un prompt más elaborado y desde luego varias interacciones con estos modelos, h
 A continuación, encontrarás los enlaces a los archivos HTML generados para cada implementación del juego SNAKE. Haz clic en cada enlace para abrir los archivos en una nueva pestaña del navegador:
 
 - <a href="snake_game_by_GPT-4o.html" target="_blank">Juego SNAKE - Implementación GPT-4o</a>
+- <a href="snake_game_by_GPT_5_Codex.html" target="_blank">Juego SNAKE - Implementación GPT-5 Codex</a>
 - <a href="snake_game_by_Claude_3.5_Sonnet .html" target="_blank">Juego SNAKE - Implementación Claude 3.5 Sonnet</a>
+- <a href="snake_game_by_Claude_4.5_Sonnet.html" target="_blank">Juego SNAKE - Implementación Claude 4.5 Sonnet</a>
+- <a href="snake_game_by_Grok_Code_Fast1.html" target="_blank">Juego SNAKE - Implementación Grok Code Fast1</a>
 - <a href="snake_game_by_DeepSeek_R1.html" target="_blank">Juego SNAKE - Implementación DeepSeek R1</a>
 - <a href="snake_game_by_Gemini_2.0_Flash.html" target="_blank">Juego SNAKE - Implementación Gemini 2.0 Flash</a>
 - <a href="snake_game_by_Gemini_2.5_Pro.html" target="_blank">Juego SNAKE - Implementación Gemini 2.5 Pro</a>
@@ -110,3 +122,7 @@ A continuación, encontrarás los enlaces a los archivos HTML generados para cad
 ---
 
 ¡Espero que este análisis te haya resultado interesante! 🚀
+
+---
+
+**Última actualización:** 18 de octubre de 2025
