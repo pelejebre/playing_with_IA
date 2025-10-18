@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Snake Game by GitHub Copilot</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --bg-dark: #050510;
+  --panel: rgba(20, 24, 45, 0.9);
+  --grid-line: rgba(255, 255, 255, 0.04);
+  --snake-green: #4caf50;
+  --snake-red: #f44336;
+  --accent: #ff4081;
+  --btn-bg: #1f253f;
+  --btn-hover: #2d3757;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top, #15192f 0%, #070711 55%, #020105 100%);
+  color: #e2e6ff;
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 0.08em;
+}
+
+.container {
+  width: 540px;
+  max-width: 92vw;
+  text-align: center;
+}
+
+.title {
+  display: inline-block;
+  margin-bottom: 16px;
+  font-size: clamp(22px, 5vw, 34px);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  animation: glow 3.2s infinite ease-in-out;
+}
+
+.title span {
+  display: inline-block;
+  margin: 0 2px;
+}
+
+.title span:nth-child(1) { color: #ff4f6d; }
+.title span:nth-child(2) { color: #ffd452; }
+.title span:nth-child(3) { color: #66ff8a; }
+.title span:nth-child(4) { color: #4db8ff; }
+.title span:nth-child(5) { color: #c18bff; }
+.title span:nth-child(6) { color: #ff7043; }
+.title span:nth-child(7) { color: #5effe7; }
+.title span:nth-child(8) { color: #ffeb3b; }
+.title span:nth-child(9) { color: #9c8cff; }
+
+@keyframes glow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.24)); }
+  50% { filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5)); }
+}
+
+.game-wrapper {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  border-radius: 18px;
+  background: var(--panel);
+  box-shadow: 0 18px 38px rgba(5, 7, 16, 0.6);
+  backdrop-filter: blur(6px);
+  animation: pulseBorder 6s infinite ease-in-out;
+}
+
+@keyframes pulseBorder {
+  0%, 100% { box-shadow: 0 18px 38px rgba(5, 7, 16, 0.55), 0 0 0 0 rgba(95, 255, 231, 0.25); }
+  50% { box-shadow: 0 22px 42px rgba(5, 7, 16, 0.75), 0 0 18px 6px rgba(102, 255, 138, 0.28); }
+}
+
+canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(5, 10, 28, 0.95) 0%, rgba(9, 20, 46, 0.96) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  image-rendering: pixelated;
+}
+
+.status {
+  margin-top: 18px;
+  font-size: 11px;
+  color: rgba(226, 230, 255, 0.82);
+}
+
+button {
+  margin-top: 18px;
+  padding: 16px 36px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: #f7f9ff;
+  background: var(--btn-bg);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 8px 18px rgba(4, 8, 20, 0.45);
+}
+
+button:hover {
+  background: var(--btn-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(4, 8, 20, 0.55);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.overlay {
+  position: absolute;
+  inset: 28px;
+  border-radius: 14px;
+  background: rgba(7, 9, 18, 0.82);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  padding: 32px;
+  text-align: center;
+  transition: opacity 0.22s ease;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay:not(.hidden) {
+  opacity: 1;
+}
+
+.overlay h2 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.16em;
+  color: #ff5f7e;
+}
+
+.overlay p {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.6;
+  color: rgba(226, 230, 255, 0.8);
+}
+
+.overlay .actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.overlay .actions button {
+  margin-top: 0;
+  padding: 12px 18px;
+  font-size: 10px;
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">
+      <span>S</span><span>N</span><span>A</span><span>K</span><span>E</span><span>&nbsp;</span><span>G</span><span>A</span><span>M</span><span>E</span>
+    </h1>
+    <div class="game-wrapper">
+      <canvas id="gameCanvas" width="480" height="480"></canvas>
+      <div id="overlay" class="overlay hidden">
+        <h2 id="overlayTitle">GAME OVER</h2>
+        <p id="overlayMessage">La partida ha terminado.</p>
+        <div class="actions">
+          <button id="restartButton">REINICIAR</button>
+          <button id="exitButton">SALIR</button>
+        </div>
+      </div>
+    </div>
+    <div class="status" id="statusLabel">Pulsa PLAY para comenzar.</div>
+    <button id="playButton">PLAY</button>
+  </div>
+
+<script>
+// Main game controller encapsulating state, rendering, and interactions.
+class SnakeGame {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.tileSize = 24;
+    this.tiles = canvas.width / this.tileSize;
+    this.loop = this.loop.bind(this);
+    this.handleKey = this.handleKey.bind(this);
+
+    this.overlay = document.getElementById('overlay');
+    this.overlayTitle = document.getElementById('overlayTitle');
+    this.overlayMessage = document.getElementById('overlayMessage');
+    this.playButton = document.getElementById('playButton');
+    this.restartButton = document.getElementById('restartButton');
+    this.exitButton = document.getElementById('exitButton');
+    this.statusLabel = document.getElementById('statusLabel');
+
+    this.playButton.addEventListener('click', () => this.start());
+    this.restartButton.addEventListener('click', () => this.restart());
+    this.exitButton.addEventListener('click', () => this.exitGame());
+    document.addEventListener('keydown', this.handleKey);
+
+    this.reset();
+    this.draw();
+  }
+
+  reset() {
+    this.direction = { x: 1, y: 0 };
+    this.pendingDirection = { x: 1, y: 0 };
+    const start = { x: Math.floor(this.tiles / 2), y: Math.floor(this.tiles / 2) };
+    this.segments = [start];
+    this.prevSegments = this.segments.map(seg => ({ ...seg }));
+    this.food = this.randomFood();
+    this.elapsed = 0;
+    this.speed = 160;
+    this.running = false;
+    this.snakeColor = '#4caf50';
+    this.lastFrame = performance.now();
+    this.overlay.classList.add('hidden');
+    this.statusLabel.textContent = 'Listo. Usa las flechas para guiar a la serpiente.';
+  }
+
+  start() {
+    if (this.running) {
+      return;
+    }
+    this.reset();
+    this.running = true;
+    this.lastFrame = performance.now();
+    requestAnimationFrame(this.loop);
+  }
+
+  restart() {
+    this.overlay.classList.add('hidden');
+    this.start();
+  }
+
+  exitGame() {
+    this.running = false;
+    this.overlay.classList.add('hidden');
+    this.statusLabel.textContent = 'Salir seleccionado. Pulsa PLAY para volver a jugar.';
+  }
+
+  loop(timestamp) {
+    if (!this.running) {
+      return;
+    }
+    const delta = timestamp - this.lastFrame;
+    this.lastFrame = timestamp;
+    this.elapsed += delta;
+
+    if (this.elapsed >= this.speed) {
+      this.elapsed -= this.speed;
+      this.step();
+    }
+
+    this.draw();
+    requestAnimationFrame(this.loop);
+  }
+
+  step() {
+    this.prevSegments = this.segments.map(seg => ({ ...seg }));
+    this.direction = { ...this.pendingDirection };
+
+    const head = {
+      x: this.segments[0].x + this.direction.x,
+      y: this.segments[0].y + this.direction.y,
+    };
+
+    if (head.x < 0 || head.y < 0 || head.x >= this.tiles || head.y >= this.tiles) {
+      this.triggerGameOver('La serpiente chocó contra la pared');
+      return;
+    }
+
+    if (this.segments.some(seg => seg.x === head.x && seg.y === head.y)) {
+      this.triggerGameOver('La serpiente chocó consigo misma');
+      return;
+    }
+
+    this.segments.unshift(head);
+
+    if (head.x === this.food.x && head.y === this.food.y) {
+      this.food = this.randomFood();
+      this.adjustSpeed();
+      this.statusLabel.textContent = `Longitud: ${this.segments.length}`;
+      if (this.segments.length >= 20) {
+        this.triggerVictory();
+        return;
+      }
+    } else {
+      this.segments.pop();
+    }
+  }
+
+  adjustSpeed() {
+    const bonus = this.segments.length - 1;
+    this.speed = Math.max(70, 160 - bonus * 4);
+  }
+
+  triggerGameOver(reason) {
+    this.running = false;
+    this.snakeColor = '#f44336';
+    this.draw();
+    this.overlayTitle.textContent = 'GAME OVER';
+    this.overlayMessage.textContent = `${reason}. Longitud final: ${this.segments.length}.`;
+    this.overlay.classList.remove('hidden');
+    this.statusLabel.textContent = 'Juego terminado. Intenta de nuevo con REINICIAR o PLAY.';
+  }
+
+  triggerVictory() {
+    this.running = false;
+    this.draw();
+    this.overlayTitle.textContent = 'VICTORY';
+    this.overlayMessage.textContent = '¡La serpiente alcanzó la longitud máxima!';
+    this.overlay.classList.remove('hidden');
+    this.statusLabel.textContent = 'Meta alcanzada. Puedes volver a jugar cuando quieras.';
+  }
+
+  randomFood() {
+    let position;
+    do {
+      position = {
+        x: Math.floor(Math.random() * this.tiles),
+        y: Math.floor(Math.random() * this.tiles),
+      };
+    } while (this.segments.some(seg => seg.x === position.x && seg.y === position.y));
+    return position;
+  }
+
+  handleKey(event) {
+    const moves = {
+      ArrowUp: { x: 0, y: -1 },
+      ArrowDown: { x: 0, y: 1 },
+      ArrowLeft: { x: -1, y: 0 },
+      ArrowRight: { x: 1, y: 0 },
+    };
+
+    if (!moves[event.key]) {
+      return;
+    }
+
+    const next = moves[event.key];
+    if (this.segments.length > 1) {
+      if (next.x === -this.direction.x && next.y === -this.direction.y) {
+        return;
+      }
+    }
+
+    this.pendingDirection = next;
+  }
+
+  draw() {
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    ctx.fillStyle = '#060812';
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= this.canvas.width; x += this.tileSize) {
+      ctx.beginPath();
+      ctx.moveTo(x + 0.5, 0);
+      ctx.lineTo(x + 0.5, this.canvas.height);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= this.canvas.height; y += this.tileSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y + 0.5);
+      ctx.lineTo(this.canvas.width, y + 0.5);
+      ctx.stroke();
+    }
+
+    ctx.save();
+    ctx.fillStyle = '#ffca28';
+    ctx.shadowColor = 'rgba(255, 202, 40, 0.4)';
+    ctx.shadowBlur = 12;
+    this.drawRoundedRect(
+      this.food.x * this.tileSize + 4,
+      this.food.y * this.tileSize + 4,
+      this.tileSize - 8,
+      this.tileSize - 8,
+      6
+    );
+    ctx.restore();
+
+    const progress = Math.min(1, this.elapsed / this.speed);
+
+    this.segments.forEach((segment, index) => {
+      const referenceIndex = index === 0 ? 0 : index - 1;
+      const reference = this.prevSegments[referenceIndex] || segment;
+      const interpX = (reference.x + (segment.x - reference.x) * progress) * this.tileSize;
+      const interpY = (reference.y + (segment.y - reference.y) * progress) * this.tileSize;
+      const size = this.tileSize - 6;
+
+      const alpha = 0.6 + (index / Math.max(this.segments.length, 1)) * 0.35;
+      ctx.save();
+      ctx.fillStyle = this.applyAlpha(this.snakeColor, alpha);
+      ctx.shadowColor = this.applyAlpha(this.snakeColor, 0.4);
+      ctx.shadowBlur = 10;
+      this.drawRoundedRect(interpX + 3, interpY + 3, size, size, 7);
+      ctx.restore();
+    });
+  }
+
+  drawRoundedRect(x, y, width, height, radius) {
+    const ctx = this.ctx;
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  applyAlpha(hex, alpha) {
+    const sanitized = hex.replace('#', '');
+    const bigint = parseInt(sanitized, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha.toFixed(2)})`;
+  }
+}
+
+(function bootstrap() {
+  const canvas = document.getElementById('gameCanvas');
+  new SnakeGame(canvas);
+})();
+</script>
+</body>
+</html>
