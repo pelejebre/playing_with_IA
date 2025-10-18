@@ -99,19 +99,19 @@ Un prompt más elaborado y desde luego varias interacciones con estos modelos, h
 ---
 ## 💻 Archivos HTML
 
-A continuación, encontrarás los enlaces a los archivos HTML generados para cada implementación del juego SNAKE. Haz clic en cada enlace para abrir los archivos en una nueva pestaña del navegador:
+A continuación, encontrarás los enlaces a los archivos HTML generados para cada implementación del juego SNAKE. Haz clic en cada enlace para abrir y jugar directamente en el navegador:
 
-- <a href="snake_game_by_GPT-4o.html" target="_blank">Juego SNAKE - Implementación GPT-4o</a>
-- <a href="snake_game_by_GPT_5_Codex.html" target="_blank">Juego SNAKE - Implementación GPT-5 Codex</a>
-- <a href="snake_game_by_Claude_3.5_Sonnet .html" target="_blank">Juego SNAKE - Implementación Claude 3.5 Sonnet</a>
-- <a href="snake_game_by_Claude_4.5_Sonnet.html" target="_blank">Juego SNAKE - Implementación Claude 4.5 Sonnet</a>
-- <a href="snake_game_by_Grok_Code_Fast1.html" target="_blank">Juego SNAKE - Implementación Grok Code Fast1</a>
-- <a href="snake_game_by_DeepSeek_R1.html" target="_blank">Juego SNAKE - Implementación DeepSeek R1</a>
-- <a href="snake_game_by_Gemini_2.0_Flash.html" target="_blank">Juego SNAKE - Implementación Gemini 2.0 Flash</a>
-- <a href="snake_game_by_Gemini_2.5_Pro.html" target="_blank">Juego SNAKE - Implementación Gemini 2.5 Pro</a>
-- <a href="snake_game_by_Llama3.3-70b.html" target="_blank">Juego SNAKE - Implementación Llama 3.3 70b</a>
-- <a href="snake_game_by_Phi4.html" target="_blank">Juego SNAKE - Implementación Phi 4</a>
-- <a href="snake_game_by_Qwen2.5-Coder-32b.html" target="_blank">Juego SNAKE - Implementación Qwen 2.5 Coder 32b</a>
+- <a href="https://raw.githack.com/pelejebre/playing_with_IA/main/snake_game/snake_game_by_GPT-4o.html" target="_blank">🎮 Juego SNAKE - Implementación GPT-4o</a>
+- <a href="https://raw.githack.com/pelejebre/playing_with_IA/main/snake_game/snake_game_by_GPT_5_Codex.html" target="_blank">🎮 Juego SNAKE - Implementación GPT-5 Codex</a>
+- <a href="https://raw.githack.com/pelejebre/playing_with_IA/main/snake_game/snake_game_by_Claude_3.5_Sonnet%20.html" target="_blank">🎮 Juego SNAKE - Implementación Claude 3.5 Sonnet</a>
+- <a href="https://raw.githack.com/pelejebre/playing_with_IA/main/snake_game/snake_game_by_Claude_4.5_Sonnet.html" target="_blank">🎮 Juego SNAKE - Implementación Claude 4.5 Sonnet</a>
+- <a href="https://raw.githack.com/pelejebre/playing_with_IA/main/snake_game/snake_game_by_Grok_Code_Fast1.html" target="_blank">🎮 Juego SNAKE - Implementación Grok Code Fast1</a>
+- <a href="https://raw.githack.com/pelejebre/playing_with_IA/main/snake_game/snake_game_by_DeepSeek_R1.html" target="_blank">🎮 Juego SNAKE - Implementación DeepSeek R1</a>
+- <a href="https://raw.githack.com/pelejebre/playing_with_IA/main/snake_game/snake_game_by_Gemini_2.0_Flash.html" target="_blank">🎮 Juego SNAKE - Implementación Gemini 2.0 Flash</a>
+- <a href="https://raw.githack.com/pelejebre/playing_with_IA/main/snake_game/snake_game_by_Gemini_2.5_Pro.html" target="_blank">🎮 Juego SNAKE - Implementación Gemini 2.5 Pro</a>
+- <a href="https://raw.githack.com/pelejebre/playing_with_IA/main/snake_game/snake_game_by_Llama3.3-70b.html" target="_blank">🎮 Juego SNAKE - Implementación Llama 3.3 70b</a>
+- <a href="https://raw.githack.com/pelejebre/playing_with_IA/main/snake_game/snake_game_by_Phi4.html" target="_blank">🎮 Juego SNAKE - Implementación Phi 4</a>
+- <a href="https://raw.githack.com/pelejebre/playing_with_IA/main/snake_game/snake_game_by_Qwen2.5-Coder-32b.html" target="_blank">🎮 Juego SNAKE - Implementación Qwen 2.5 Coder 32b</a>
 
 
 ---
